@@ -3,10 +3,12 @@ from data import Prices
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
+from simplejson import dumps as simpledumps
+
 import sys
 sys.path.insert(0, './scripts')
 import selects
-from inserts import insert_into_users
+from inserts import insert_into_users, insert_into_orders
 
 
 
@@ -37,6 +39,17 @@ def about():
 	return render_template('about.html')
 
 
+
+
+@app.route('/get_orders', methods = ['GET'])
+def get_orders():
+	return simpledumps(selects.find_orders())
+
+
+
+
+
+
 @app.route('/prices')
 def prices():
 	return render_template('prices.html', prices = Prices)
@@ -45,6 +58,12 @@ def prices():
 def get_questions():
 	return selects.get_questions()
 
+@app.route('/submitorder', methods = ['POST'])
+def submitorder():
+        orderinfo = request.get_json()
+        print(orderinfo)
+        insert_into_orders(orderinfo)
+        return 'True'
 
 """@app.route('/register', methods = ['POST'])
 def register():

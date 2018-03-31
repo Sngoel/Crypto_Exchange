@@ -4,6 +4,11 @@ var tableTimer;
 
 $(document).ready(function(){
 
+
+	get("/get_orders", function(response){
+		console.log(response);
+	});
+
 	//Create HTML table
 	var columns = 4;
 	var rows = 16;
@@ -58,7 +63,7 @@ $(document).ready(function(){
 			currentRow = currentRow.next();
 		}
 		currentIndex += shiftBy;
-		console.log(currentIndex);
+		// console.log(currentIndex);
 		//console.log(currentIndex);
 	}
 
@@ -88,4 +93,49 @@ var pauseData = function(){
 	clearInterval(tableTimer);
 }
 
+var PlaceBuyOrder= function(){
+        var orderinfo = {
+                amount : document.getElementById('AMOUNT').value,
+                price : document.getElementById('PRICE').value,
+								ordertype : "Buy"
+                }
+                post('/submitorder',orderinfo, function(response){
+                        console.log(response)
+                })
 
+}
+
+var PlaceSellOrder= function(){
+        var orderinfo = {
+                amount : document.getElementById('AMOUNT').value,
+                price : document.getElementById('PRICE').value,
+								ordertype : 'Sell'
+                }
+                post('/submitorder',orderinfo, function(response){
+                        console.log(response)
+                })
+
+}
+
+var post = function(url, data, callback){
+        $.ajax({
+        type : "POST",
+        url : url,
+        data: JSON.stringify(data),
+        contentType: 'application/json;charset=UTF-8',
+        success: function(response) {
+        callback(response);
+        }
+        });
+}
+
+var get = function(url, callback){
+        $.ajax({
+	        type : "GET",
+	        url : url,
+	        contentType: 'application/json;charset=UTF-8',
+	        success: function(response) {
+	        	callback(response);
+	        }
+        });
+}
