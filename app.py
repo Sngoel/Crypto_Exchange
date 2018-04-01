@@ -1,23 +1,31 @@
 from flask import Flask, render_template, flash, request, redirect, url_for, logging, jsonify, json
-from data import Prices
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
+from simplejson import dumps as simpledumps
 
 import sys
 sys.path.insert(0, './scripts')
+
+import login_functions
 import selects
-from inserts import insert_into_users
+import inserts
+
 
 
 
 app = Flask(__name__, static_url_path='/static')
 
-Prices = Prices()
 
 
 @app.route('/')
 def index():
 	return render_template('landing.html')
+
+
+@app.route('/login')
+def login():
+	return render_template('login.html')
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -28,28 +36,46 @@ def dashboard():
 def forum():
 	return render_template('forum.html')
 
+
 @app.route('/thread')
 def thread():
 	return render_template('thread.html')
 
-@app.route('/about')
-def about():
-	return render_template('about.html')
 
 
-@app.route('/prices')
-def prices():
-	return render_template('prices.html', prices = Prices)
+
+
+
+##########################################
+###      POST/GET REQUEST HANDLERS     ###
+##########################################
+
+
+@app.route('/validate_login', methods = ['POST'])
+def validate_login():
+	if login_functions.check_login(request.get_json()):
+		return url_for("dashboard")
+	else: 
+		return "false"
+
+
+@app.route('/get_orders', methods = ['GET'])
+def get_orders():
+	return simpledumps(selects.find_orders())
+
+
+
+#### NEED TO CHECK AND MAKE SURE THIS WAS ACTUALLY SUCCESSFUL ###
+@app.route('/submit_order', methods = ['POST'])
+def submit_order():
+    inserts.insert_into_orders(request.get_json())
+    return 'True'
+
 
 @app.route('/get_questions', methods = ['POST'])
 def get_questions():
 	return selects.get_questions()
 
-
-"""@app.route('/register', methods = ['POST'])
-def register():
-	print(request.get_json())
-	return "It worked"""
 
 class RegisterForm(Form):
 	name = StringField('Name', [validators.Length(min=4, max=50)])
@@ -79,7 +105,7 @@ def register():
 		print("Test")
 		print(input_form)
 		flash('You are now registered with 0x431 Exchange')
-		insert_into_users(input_form)
+		inserts.insert_into_users(input_form)
 		return render_template('register.html', form= form)
 
 	return render_template('register.html', form= form)

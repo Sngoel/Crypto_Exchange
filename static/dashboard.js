@@ -1,8 +1,16 @@
 //This file contains the JavaScript for dashboard.html
 
 var tableTimer;
+var username;
 
 $(document).ready(function(){
+
+	username = sessionStorage.getItem("username");
+	
+
+	get("/get_orders", function(response){
+		console.log(response);
+	});
 
 	//Create HTML table
 	var columns = 4;
@@ -58,8 +66,6 @@ $(document).ready(function(){
 			currentRow = currentRow.next();
 		}
 		currentIndex += shiftBy;
-		console.log(currentIndex);
-		//console.log(currentIndex);
 	}
 
 	//Call updateTable() every secondsBetweenUpdates seconds
@@ -84,8 +90,50 @@ var getOrderBook = function(){
 	});
 }
 
+
 var pauseData = function(){
 	clearInterval(tableTimer);
 }
 
 
+
+var place_order = function(order_type){
+
+    var order_info = {
+		amount : document.getElementById('amount').value,
+		price : document.getElementById('price').value,
+		order_type : order_type
+    };
+
+    post('/submit_order', order_info, function(response){
+    	console.log(response)
+    });
+}
+
+
+
+//POST wrapper function
+var post = function(url, data, callback){
+        $.ajax({
+        type : "POST",
+        url : url,
+        data: JSON.stringify(data),
+        contentType: 'application/json;charset=UTF-8',
+        success: function(response) {
+        callback(response);
+        }
+        });
+}
+
+
+//GET wrapper function
+var get = function(url, callback){
+    $.ajax({
+        type : "GET",
+        url : url,
+        contentType: 'application/json;charset=UTF-8',
+        success: function(response) {
+        	callback(response);
+        }
+    });
+}

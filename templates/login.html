@@ -1,6 +1,8 @@
 <html>
 <head>
 	<title>Log In Page</title>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src = "{{url_for('static', filename='login.js')}}"></script>
 </head>
 <body>
 	<p>Username:&nbsp;</p>
@@ -8,5 +10,10 @@
 
 	<p>Password: &nbsp;</p>
 	<input type = "password" id = "password">
+
+	<br><br>
+
+	<input type = "button" value = "Submit" onclick = "validate()">
+
 </body>
 </html>

@@ -22,7 +22,25 @@
 		<input id = "search_bar" type = "text" style = "width: 30%; height: 90%; float: right; margin: 0.2% 3%; font-size: 1.5em; text-align: right; color: grey;" value = "Search&nbsp;">
 	</div>
 
+	<br><br>
+
+	Amount of Eth:<br>
+	<input type="text" id = 'amount'><br>
+
+	Price:<br>
+	<input type="text" id = 'price'><br>
+
+	<!--      
+	Amount of BTC:<br>
+	<input type="text" name="lastname" value=""><br> -->
+	
 	<br>
+	<input type = "button" value = "Buy Order" onclick = "place_order('Buy')">
+	<input type = "button" value = "Sell Order" onclick = "place_order('Sell')">
+
+	<br><br><br>
+
+
 
 	<input type = "button" style = "font-size: 2em;" value = "Gimme data" onclick = "getOrderBook()">
 	<input type = "button" style = "font-size: 2em;" value = "Pause data" onclick = "pauseData()">
