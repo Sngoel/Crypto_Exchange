@@ -51,7 +51,7 @@ def insert_into_orders(order_info):
 
     #user_id
 
-    cur.execute("INSERT INTO open_orders (coin_id_out, coin_id_in, ordertype ,amount_out, amount_in) VALUES( %s, %s,%s, %s, %s);", (coin_id_out, coin_id_in, order_type, amount_out, amount_in))
+    cur.execute("INSERT INTO open_orders (coin_id_out, coin_id_in, order_type ,amount_out, amount_in) VALUES( %s, %s,%s, %s, %s);", (coin_id_out, coin_id_in, order_type, amount_out, amount_in))
 
     #Destroy connection
     cur.close()
