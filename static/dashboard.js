@@ -18,6 +18,7 @@ var secondsBetweenUpdates = 1;
 $(document).ready(function(){
 
 	username = sessionStorage.getItem("username");
+	console.log(username);
 	
 
 	//Get order data for table from server
