@@ -19,7 +19,8 @@ def delete_tables():
         "DROP TABLE open_orders CASCADE",
         "DROP TABLE categories CASCADE",
         "DROP TABLE question_votes CASCADE",
-        "DROP TABLE comment_votes CASCADE"
+        "DROP TABLE comment_votes CASCADE",
+        "DROP TABLE coins CASCADE"
     )
 
     for command in commands:
