@@ -36,6 +36,23 @@ def create_and_populate_tables():
                 amount_out DECIMAL(12,8),
                 amount_in DECIMAL(12,8))""",
 
+        """CREATE TABLE coins(
+                coin_id varchar(3)
+        )""",
+
+        """INSERT INTO coins (coin_id) VALUES
+            ('BTC'),
+            ('ETH'),
+            ('XRP'),
+            ('BCH'),
+            ('LTC'),
+            ('EOS'),
+            ('ADA'),
+            ('XLM'),
+            ('NEO'),
+            ('XMR')
+            """,
+
         """INSERT INTO open_orders (user_id, coin_id_out, coin_id_in, order_type, amount_out, amount_in) VALUES
             (1, 'BTC', 'ETH', 'Buy', 2.09318018, 8.39184928),
             (3, 'BTC', 'ETH', 'Sell', 2.19385710, 0.12390193),
