@@ -18,24 +18,13 @@ var secondsBetweenUpdates = 1;
 $(document).ready(function(){
 
 	username = sessionStorage.getItem("username");
-	console.log(username);
+	//console.log(username);
 	
 
 	//Get order data for table from server
 	get("/get_orders", function(response){
 
-		//Data comes back as a string, so store correctly formatted data in "order_data"
-		array_of_strings = response.split("], [");
-
-		for(let i = 0; i < array_of_strings.length; i++){
-			order_data.push(array_of_strings[i].split(", "));
-		}
-
-		for(let i = 0; i < order_data.length; i++){
-			for(let j = 0; j < order_data[i].length; j++){
-				order_data[i][j] = order_data[i][j].replace(/[\[\]"]+/g, '');
-			}
-		}
+		order_data = response;
 
 
 		/***********************************************
@@ -50,14 +39,11 @@ $(document).ready(function(){
 			for(let j = 0; j < columns; j++){
 				var dataCellNode = document.createElement("TD");
 
-
-
 				var column_mapping = [4, 2, 5];
 
-				//var textNode = document.createTextNode(order_data[i][column_mapping[j]]);
+				var text = order_data[i][column_mapping[j]];
 
-
-				var text;
+				/*var text;
 				if(j == 0){
 					text = order_data[i][4];
 				}
@@ -68,7 +54,7 @@ $(document).ready(function(){
 
 				else if(j == 2){
 					text = order_data[i][5];
-				}
+				}*/
 
 				var textNode = document.createTextNode(order_data[i][column_mapping[j]]);
 				dataCellNode.appendChild(textNode);
@@ -98,7 +84,7 @@ $(document).ready(function(){
 //This is the function that's called every x seconds to update the table
 var updateTable = function(){
 	var currentRow = $("tr").first();
-	for(let i = 0; i < rows; i++){
+	for(let i = 1; i < rows; i++){
 
 		var currentCell = currentRow.children().first();
 
@@ -133,31 +119,7 @@ var place_order = function(order_type){
 }
 
 
-//POST wrapper function
-var post = function(url, data, callback){
-        $.ajax({
-        type : "POST",
-        url : url,
-        data: JSON.stringify(data),
-        contentType: 'application/json;charset=UTF-8',
-        success: function(response) {
-        callback(response);
-        }
-        });
-}
 
-
-//GET wrapper function
-var get = function(url, callback){
-    $.ajax({
-        type : "GET",
-        url : url,
-        contentType: 'application/json;charset=UTF-8',
-        success: function(response) {
-        	callback(response);
-        }
-    });
-}
 
 
 

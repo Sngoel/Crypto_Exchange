@@ -5,7 +5,7 @@ $(document).ready(function(){
 
 		var question_template = {
 			beginning: '<div id = "',
-			middle1: '" class = "question_container">',
+			middle1: '" class = "question_container" onclick = "select_thread(event)">',
 			end: '</div>'
 		};
 
@@ -25,6 +25,11 @@ $(document).ready(function(){
 
 });
 
+
+var select_thread = function(){
+	sessionStorage.setItem("question_id", event.target.id);
+	window.location = "/thread";
+}
 
 
 var post = function(url, data, callback){

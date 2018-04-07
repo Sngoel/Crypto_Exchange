@@ -50,18 +50,19 @@ def thread():
 ###      POST/GET REQUEST HANDLERS     ###
 ##########################################
 
+@app.route('/get_questions', methods = ['POST'])
+def get_questions():
+	return jsonify(selects.get_questions())#Need to add category parameter
 
-@app.route('/validate_login', methods = ['POST'])
-def validate_login():
-	if login_functions.check_login(request.get_json()):
-		return url_for("dashboard")
-	else: 
-		return "false"
+
+@app.route('/load_thread', methods = ['POST'])
+def load_thread():
+	return jsonify(selects.load_thread(request.get_json()))
 
 
 @app.route('/get_orders', methods = ['GET'])
 def get_orders():
-	return simpledumps(selects.find_orders())
+	return jsonify(selects.find_orders())
 
 
 
@@ -72,9 +73,13 @@ def submit_order():
     return 'True'
 
 
-@app.route('/get_questions', methods = ['POST'])
-def get_questions():
-	return selects.get_questions()
+@app.route('/validate_login', methods = ['POST'])
+def validate_login():
+	if login_functions.check_login(request.get_json()):
+		return url_for("dashboard")
+	else: 
+		return "false"
+
 
 
 class RegisterForm(Form):

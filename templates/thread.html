@@ -40,24 +40,42 @@
 			display: inline-block;
 			vertical-align: top;
 		}
+		#search_bar {
+			width: 30%;
+			height: 90%;
+			float: right;
+			margin: 0.2% 3%;
+			padding: 0% 1% 0% 0%;
+			font-size: 1.5em;
+			text-align: right;
+			color: grey;
+		}
+		#header_bar_container{
+			width: 100%;
+			height: 8%;
+			background-color: orange;
+			border: 1px solid black;
+			box-sizing: border-box;
+		}
 	</style>
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
 	<script src = "{{url_for('static', filename='thread.js')}}"></script>
 
 </head>
 <body>
 	<!-- ORANGE HEADER BAR -->
-	<div style = "width: 100%; height: 8%; background-color: orange; border: 1px solid black; box-sizing: border-box;">
+	<div id = "header_bar_container">
 		<div style = "color: black; font-size: 250%; display: inline-block;">&nbsp;0x431 Cryptocurrency Exchange</div>
 		<div style = "color: black; font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/">Log Out</a></div>
 		<div style = "display: inline-block; float: right; background-color: black; width: 0.2%; height: 100%;"></div>
 		<div style = "font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/dashboard">Dashboard</a></div>
-		<input id = "search_bar" type = "text" style = "width: 30%; height: 90%; float: right; margin: 0.2% 3%; font-size: 1.5em; text-align: right; color: grey;" value = "Search&nbsp;">
+		<input id = "search_bar" type = "text" value = "Search" onclick = "clicked_search_bar()">
 	</div>
 	<br>
 
-
+		
 
 	<div id = "question_container" style = "border: 1px solid black;">
 		<div id = "rating_and_summary_container" style = "height: 10%;">
@@ -91,7 +109,7 @@
 
 
 	<!-- This div should wrap an entire comment, including the rating panel and the text description -->
-	<div class = "comment_container" style = "width: 100%; height: 10%; border: 1px solid black; box-sizing: border-box; margin: 2% 0 0 0;">
+	<div class = "comment_container" style = "display: none; width: 100%; height: 10%; border: 1px solid black; box-sizing: border-box; margin: 2% 0 0 0;">
 
 		<!-- Total vote number and upvote/downvote buttons  -->
 		<div style = "width: 15%; height: 100%; border: 1px solid blue; display: inline-block;">

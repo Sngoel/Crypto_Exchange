@@ -251,6 +251,19 @@ def create_and_populate_tables():
             (3, 1, 'Eventually, we will make it so that users can upvote and downvote comments AND questions')
         """,
 
+        """CREATE TABLE question_votes(
+            user_id INT REFERENCES users(user_id),
+            question_id INT REFERENCES questions(question_id),
+            vote_direction INT,
+            UNIQUE(user_id, question_id))""",
+
+
+
+        """CREATE TABLE comment_votes(
+            user_id INT REFERENCES users(user_id),
+            comment_id INT REFERENCES comments(comment_id),
+            vote_direction INT,
+            UNIQUE(user_id, comment_id))""",
 
 
         """CREATE TABLE categories(
