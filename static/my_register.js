@@ -23,36 +23,6 @@ var submit = function(){
 	}
 
 
-
-	/*Firebase links:
-	https://firebase.google.com/docs/auth/
-	https://firebase.google.com/docs/auth/web/password-auth
-	*/
-
-	/*
-	//Initialize Firebase
-	var config = {
-		apiKey: "AIzaSyBayBAvEAiyJS70C9hEZVD8G6T9YhhkQFM",
-		authDomain: "x431-crypto-exchange.firebaseapp.com",
-		databaseURL: "https://x431-crypto-exchange.firebaseio.com",
-		projectId: "x431-crypto-exchange",
-		storageBucket: "",
-		messagingSenderId: "603664388759"
-	};
-
-	firebase.initializeApp(config);
-
-	var email = document.getElementById("email").value;
-	var password = document.getElementById("password").value;
-
-	firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-	  // Handle Errors here.
-	  var errorCode = error.code;
-	  var errorMessage = error.message;
-	  // ...
-	});
-	*/
-
 	var registration_data = {
 		name: document.getElementById("name").value,
 		email: document.getElementById("email").value,

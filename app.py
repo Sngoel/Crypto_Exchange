@@ -82,7 +82,7 @@ def validate_login():
 
 
 
-class RegisterForm(Form):
+class Form(Form):
 	name = StringField('Name', [validators.Length(min=4, max=50)])
 	username = StringField('Username', [validators.Length(min=4, max=25)])
 	email = StringField('Email', [validators.Length(min=8, max=60)])

@@ -1,6 +1,5 @@
 $(document).ready(function(){
 
-
 	post("/get_questions", {category: "all"}, function(response){
 
 		var question_template = {
@@ -21,8 +20,6 @@ $(document).ready(function(){
 			document.body.innerHTML += complete_question_div;
 		}
 	});
-
-
 });
 
 
@@ -32,15 +29,4 @@ var select_thread = function(){
 }
 
 
-var post = function(url, data, callback){
-	$.ajax({
-        type : "POST",
-        url : url,
-        data: JSON.stringify(data),
-        contentType: 'application/json;charset=UTF-8',
-        success: function(response) {
-            callback(response);
-        }
-    });
-}
 
