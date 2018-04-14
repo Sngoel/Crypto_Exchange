@@ -5,7 +5,7 @@ def insert_into_users(forms):
 
     #Define our connection parameters
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    
+
     #Connect to database
     conn = psycopg2.connect(conn_string)
 
