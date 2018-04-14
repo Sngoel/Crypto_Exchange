@@ -42,6 +42,11 @@ def thread():
 	return render_template('thread.html')
 
 
+@app.route('/register')
+def register():
+	return render_template('register.html')
+
+
 
 
 
@@ -72,6 +77,10 @@ def submit_order():
     inserts.insert_into_orders(request.get_json())
     return 'True'
 
+@app.route('/registration', methods = ['POST'])
+def registration():
+	inserts.insert_into_users(request.get_json())
+	return 'true'
 
 @app.route('/validate_login', methods = ['POST'])
 def validate_login():
@@ -82,7 +91,7 @@ def validate_login():
 
 
 
-class Form(Form):
+"""class Form(Form):
 	name = StringField('Name', [validators.Length(min=4, max=50)])
 	username = StringField('Username', [validators.Length(min=4, max=25)])
 	email = StringField('Email', [validators.Length(min=8, max=60)])
@@ -114,7 +123,7 @@ def register():
 		return render_template('register.html', form= form)
 
 	return render_template('register.html', form= form)
-
+"""
 
 
 if __name__ == '__main__':

@@ -125,26 +125,32 @@ var vote = function(vote_direction){
 
 	//Check if the user had already voted in the SAME DIRECTION as the attempted vote
 	var prev_vote;
+	var comment_index;
 
 	for(let i = 0; i < page_info.comment_info.length; i++){
 		if(page_info.comment_info[i].id == comment_id){
+			comment_index = i;
 			prev_vote = page_info.comment_info[i].vote_direction;
 			break;
 		}
 	}
 
-	//if(prev_vote == 0){
+
+	if(prev_vote == 0){
 
 		//Update vote count in HTML
-		var comment_container = document.getElementById(comment_id);
-		var vote_container = comment_container.getElementsByClassName("vote_container")[0];
-		var vote_count_container = vote_container.getElementsByClassName("vote_count_container")[0];
-		console.log(vote_count_container.innerHTML);
-		//console.log(getElementsByClassName('vote_container')[0].getElementsByClassName('vote_count_container')[0]);
-		//console.log(vote_count_container.value);
+		var vote_count_container = document.getElementById(comment_id).getElementsByClassName("vote_container")[0].getElementsByClassName("vote_count_container")[0];
+		var current_vote = parseInt(vote_count_container.innerHTML);
+		vote_count_container.innerHTML = current_vote + vote_direction;
+		
 		//Update page_info
+		page_info.comment_info[comment_index].vote_direction = vote_direction;
+
 		//Insert new vote into database
-	//}
+		var data = {
+			
+		};
+	}
 
 	//else if(prev_vote != vote_direction){
 		//Update vote count in HTML
