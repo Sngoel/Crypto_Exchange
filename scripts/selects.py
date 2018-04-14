@@ -16,14 +16,14 @@ def get_questions():
     sql = ("SELECT * FROM questions")
 
     cur.execute(sql)
-    select_result = cur.fetchall()
+    SELECT_result = cur.fetchall()
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return select_result
+    return SELECT_result
 
 
 def load_thread(request):
@@ -43,23 +43,21 @@ def load_thread(request):
 
 
 
-    #Get summary and description for specified question
-    get_question = """ SELECT * 
-                       FROM questions 
-                       WHERE question_id = '""" + question_id + "'"
+    #Get id, summary description, and vote total for specified question    
+    get_question_info = """ SELECT Q.question_id, Q.question_summary, Q.question_desc, summed.sum 
+                            FROM questions Q, (
+                                SELECT join1.qid, sum(vote_dir) 
+                                FROM (
+                                    SELECT Q.question_id AS qid, Q.question_summary AS q_summ, V.vote_direction AS vote_dir 
+                                    FROM questions Q, question_votes V WHERE Q.question_id = V.question_id) AS join1 
+                                GROUP BY join1.qid) AS summed 
+                            WHERE Q.question_id = summed.qid AND 
+                                  Q.question_id = '""" + question_id + "'"
 
-    cur.execute(get_question)
-    thread_info['question_info'] = cur.fetchall()
 
 
-
-    #Get total vote count for specified question
-    get_question_votes = """ SELECT SUM(vote_direction) 
-                             FROM question_votes 
-                             WHERE question_id = '""" + question_id + "'"
-
-    cur.execute(get_question_votes)
-    thread_info['question_vote_count'] = cur.fetchall()
+    cur.execute(get_question_info)
+    thread_info['question'] = cur.fetchall()
 
 
 
@@ -76,24 +74,20 @@ def load_thread(request):
 
 
     #Get all comments for specified question
-    get_comments = """ SELECT * 
-                       FROM comments 
-                       WHERE question_id = '""" + question_id + "'"
+    get_comments = """  SELECT C.comment_id, C.comment_text, summed.sum 
+                        FROM comments C, (
+                            SELECT join1.cid, sum(join1.vote_dir) 
+                            FROM (
+                                SELECT C.comment_id AS cid, V.vote_direction AS vote_dir 
+                                FROM comments C, comment_votes V 
+                                WHERE C.comment_id = V.comment_id) AS join1 
+                            GROUP BY join1.cid) AS summed 
+                        WHERE C.comment_id = summed.cid AND 
+                              C.question_id = '""" + question_id + "'"
 
     cur.execute(get_comments)
     thread_info['comments'] = cur.fetchall()
 
-
-
-    #Get total vote count for all comments
-    get_comment_votes = """ SELECT comment_votes.comment_id, SUM(comment_votes.vote_direction) 
-                            FROM comment_votes, comments 
-                            WHERE comments.question_id = '""" + question_id + """'
-                                  AND comments.comment_id = comment_votes.comment_id 
-                            GROUP BY comment_votes.comment_id"""
-
-    cur.execute(get_comment_votes)
-    thread_info['comment_vote_counts'] = cur.fetchall()    
 
 
 
@@ -129,12 +123,12 @@ def find_orders():
     sql = ("SELECT * FROM open_orders")
 
     cur.execute(sql)
-    select_result = cur.fetchall()
+    SELECT_result = cur.fetchall()
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return select_result
+    return SELECT_result
 

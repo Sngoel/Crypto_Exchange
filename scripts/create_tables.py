@@ -85,7 +85,7 @@ def create_and_populate_tables():
 
 
         ###################################################
-        ###   ALL QUESTION-RELATED TABLES AND INSERTS   ###
+        ###   ALL COMMENT-RELATED TABLES AND INSERTS   ###
         ###################################################
          
         """CREATE TABLE comments (
