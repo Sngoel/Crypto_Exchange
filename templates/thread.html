@@ -1,6 +1,12 @@
 <html>
 <head>
 	<title>0x431 Forum</title>
+
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
+	<script src = "{{url_for('static', filename='thread.js')}}"></script>
+
 	<style>
 		table {border: 0.1em solid black;}
 		tr {border: 0.1em solid black;}
@@ -95,17 +101,12 @@
 		}
 
 	</style>
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
-	<script src = "{{url_for('static', filename='thread.js')}}"></script>
-
 </head>
 <body>
 	<!-- ORANGE HEADER BAR -->
 	<div id = "header_bar_container">
 		<div style = "color: black; font-size: 250%; display: inline-block;">&nbsp;0x431 Cryptocurrency Exchange</div>
-		<div style = "color: black; font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/">Log Out</a></div>
+		<div style = "color: black; font-size: 2em; margin: 0.2em; display: inline-block; float: right;" onclick = "log_out()">Log Out</div>
 		<div style = "display: inline-block; float: right; background-color: black; width: 0.2%; height: 100%;"></div>
 		<div style = "font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/dashboard">Dashboard</a></div>
 		<input id = "search_bar" type = "text" value = "Search" onclick = "clicked_search_bar()">

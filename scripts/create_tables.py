@@ -111,35 +111,19 @@ def create_and_populate_tables():
         "INSERT INTO comment_votes VALUES " + generate_votes(4, 5))
 
 
-        
 
-
-
-
-
-#user_id in will have to go back into open_orders
-    selects = (
-        "SELECT * FROM users",
-        "SELECT * FROM questions",
-        "SELECT * FROM comments",
-        "SELECT * FROM open_orders"
-    )
-
-
+    #Execute queries
     for create in creates:
         cur.execute(create)
-
-    for select in selects:
-        cur.execute(select)
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
 
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
+
+
+
 
 
 def array_to_sql_string(array):

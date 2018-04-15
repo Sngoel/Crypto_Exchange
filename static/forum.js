@@ -1,5 +1,8 @@
 $(document).ready(function(){
 
+	//If user is not currently logged in, redirect to landing page
+	check_if_logged_in();
+
 	post("/get_questions", {category: "all"}, function(response){
 
 		var question_template = {

@@ -16,14 +16,14 @@ def get_questions():
     sql = ("SELECT * FROM questions")
 
     cur.execute(sql)
-    SELECT_result = cur.fetchall()
+    select_result = cur.fetchall()
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return SELECT_result
+    return select_result
 
 
 def load_thread(request):
@@ -46,7 +46,7 @@ def load_thread(request):
     #Get id, summary description, and vote total for specified question    
     get_question_info = """ SELECT Q.question_id, Q.question_summary, Q.question_desc, summed.sum 
                             FROM questions Q, (
-                                SELECT join1.qid, sum(vote_dir) 
+                                SELECT join1.qid, SUM(vote_dir)
                                 FROM (
                                     SELECT Q.question_id AS qid, Q.question_summary AS q_summ, V.vote_direction AS vote_dir 
                                     FROM questions Q, question_votes V WHERE Q.question_id = V.question_id) AS join1 
@@ -76,7 +76,7 @@ def load_thread(request):
     #Get all comments for specified question
     get_comments = """  SELECT C.comment_id, C.comment_text, summed.sum 
                         FROM comments C, (
-                            SELECT join1.cid, sum(join1.vote_dir) 
+                            SELECT join1.cid, SUM(join1.vote_dir) 
                             FROM (
                                 SELECT C.comment_id AS cid, V.vote_direction AS vote_dir 
                                 FROM comments C, comment_votes V 

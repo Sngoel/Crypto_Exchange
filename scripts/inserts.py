@@ -25,6 +25,8 @@ def insert_into_users(forms):
     conn.commit()
     conn.close()
 
+    return True
+
 
 def insert_into_orders(order_info):
 
@@ -60,22 +62,22 @@ def insert_into_orders(order_info):
 
 
 
-def insert_questions(questioninfo):
-    #Define our connection string
-    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    print("Hello World!")
-    # print the connection string we will use to connect
-    #print "Connecting to database\n    ->%s" % (conn_string)
+def insert_questions(question_info):
 
-    # get a connection, if a connect cannot be made an exception will be raised here
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
     conn = psycopg2.connect(conn_string)
 
-    # conn.cursor will return a cursor object, you can use this cursor to perform queries
+    #Initialize cursor
     cur = conn.cursor()
-    user_id = questioninfo[0]
-    question_summary = questioninfo[1]
-    question_desc = questioninfo[2]
-    category = questioninfo[3]
+
+
+    user_id = question_info[0]
+    question_summary = question_info[1]
+    question_desc = question_info[2]
+    category = question_info[3]
 
 
     cur.execute("""INSERT INTO questions(user_id, question_summary, question_desc, category) VALUES(%s, %s, %s, %s);""" ,(user_id, question_summary, question_desc ,category))
@@ -83,3 +85,70 @@ def insert_questions(questioninfo):
     cur.close()
     conn.commit()
     conn.close()
+
+
+def insert_comment_vote(vote_info):
+
+    username = vote_info['username']
+    comment_id = vote_info['comment_id']
+    vote_direction = vote_info['vote_direction']
+
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + str(vote_info['username']) + "'"
+
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+
+    insert = "INSERT INTO comment_votes (user_id, comment_id, vote_direction) VALUES (" + str(user_id) + ", " + str(comment_id) + ", " + str(vote_direction) + ")"
+
+    cur.execute(insert)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"
+
+
+def update_comment_vote(vote_info):
+
+    username = vote_info['username']
+    comment_id = vote_info['comment_id']
+    vote_direction = vote_info['vote_direction']
+
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + str(vote_info['username']) + "'"
+
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+    update = "UPDATE comment_votes SET vote_direction = " + str(vote_direction) + " WHERE comment_id = " + str(comment_id) + " AND user_id = " + str(user_id)
+
+    cur.execute(update)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"

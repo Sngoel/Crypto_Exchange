@@ -36,3 +36,21 @@ var clicked_search_bar = function(){
         search_bar.value = "";
     }
 }
+
+
+var log_out = function(){
+
+    //Remove username from cookie
+    sessionStorage.removeItem("username");
+
+    //Redirect user to landing page
+    window.location = "/";
+}
+
+var check_if_logged_in = function(){
+
+    if(sessionStorage.getItem("username") === null){
+        alert("Please log in to access the 0x431 Crypto Exchange");
+        window.location = "/"
+    }
+}

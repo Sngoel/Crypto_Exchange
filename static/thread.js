@@ -9,11 +9,13 @@ var page_info = {
 
 $(document).ready(function(){
 
+	//If user is not currently logged in, redirect to landing page
+	check_if_logged_in();
+
 	//Save off question ID
 	page_info.question_info.id = sessionStorage.getItem("question_id");
 
-
-	//Prepare object to be sent with POST request
+	//Prepare POST request data object
 	var data = {
 		username: sessionStorage.getItem("username"),
 		question_id: sessionStorage.getItem("question_id")
@@ -45,8 +47,8 @@ $(document).ready(function(){
 			comment_html += response.comments[i][0] + '"><div class = "vote_container">';
 			comment_html += '<div class = "vote_count_container">'
 			comment_html += response.comments[i][2] + '</div><div class = "vote_buttons_container">';
-			comment_html += '<input type = "button" class = "vote_button" value = "Upvote" onclick = "vote(1)">';
-			comment_html += '<input type = "button" class = "vote_button" value = "Downvote" onclick = "vote(-1)">';
+			comment_html += '<input type = "button" class = "vote_button" value = "Upvote" onclick = "comment_vote(1)">';
+			comment_html += '<input type = "button" class = "vote_button" value = "Downvote" onclick = "comment_vote(-1)">';
 			comment_html += '</div></div><div class = "comment_text_container">'
 			comment_html += response.comments[i][1] + '</div></div>';
 			document.body.innerHTML += comment_html;
@@ -118,7 +120,7 @@ $(document).ready(function(){
 });
 
 
-var vote = function(vote_direction){
+var comment_vote = function(vote_direction){
 
 	//Find comment_id of the comment that the user voted on
 	var comment_id = event.target.parentNode.parentNode.parentNode.id;
@@ -146,16 +148,40 @@ var vote = function(vote_direction){
 		//Update page_info
 		page_info.comment_info[comment_index].vote_direction = vote_direction;
 
-		//Insert new vote into database
+		//Set up post request data object
 		var data = {
-			
+			username: sessionStorage.getItem("username"),
+			comment_id: comment_id,
+			vote_direction: vote_direction
 		};
+
+		//Send request to server
+		post("/insert_comment_vote", data, function(response){
+			console.log(response);
+		});
+
 	}
 
-	//else if(prev_vote != vote_direction){
+	else if(prev_vote != vote_direction){
+
 		//Update vote count in HTML
+		var vote_count_container = document.getElementById(comment_id).getElementsByClassName("vote_container")[0].getElementsByClassName("vote_count_container")[0];
+		var current_vote = parseInt(vote_count_container.innerHTML);
+		vote_count_container.innerHTML = current_vote + 2 * vote_direction;
+
 		//Update page_info
-		//Update vote in database
-	//}
-	//console.log(prev_vote);
+		page_info.comment_info[comment_index].vote_direction = vote_direction;
+
+		//Set up post request data object
+		var data = {
+			username: sessionStorage.getItem("username"),
+			comment_id: comment_id,
+			vote_direction: vote_direction
+		};
+
+		//Send request to server
+		post("/update_comment_vote", data, function(response){
+			console.log(response);
+		});
+	}
 }

@@ -17,6 +17,9 @@ var secondsBetweenUpdates = 1;
 
 $(document).ready(function(){
 
+	//If user is not currently logged in, redirect to landing page
+	check_if_logged_in();
+
 	username = sessionStorage.getItem("username");
 	//console.log(username);
 	
