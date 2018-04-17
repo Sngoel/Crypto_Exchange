@@ -2,8 +2,13 @@
 <head>
 	<title>0x431 Forum</title>
 
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- jQuery -->
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+	<!-- Our JS -->
 	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
 	<script src = "{{url_for('static', filename='thread.js')}}"></script>
 
@@ -103,15 +108,27 @@
 	</style>
 </head>
 <body>
-	<!-- ORANGE HEADER BAR -->
-	<div id = "header_bar_container">
-		<div style = "color: black; font-size: 250%; display: inline-block;">&nbsp;0x431 Cryptocurrency Exchange</div>
-		<div style = "color: black; font-size: 2em; margin: 0.2em; display: inline-block; float: right;" onclick = "log_out()">Log Out</div>
-		<div style = "display: inline-block; float: right; background-color: black; width: 0.2%; height: 100%;"></div>
-		<div style = "font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/dashboard">Dashboard</a></div>
-		<input id = "search_bar" type = "text" value = "Search" onclick = "clicked_search_bar()">
-	</div>
-	<br>
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><strong>0x431 Cryptocurrency Exchange</strong></a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li><a href="/forum">Forum</a></li>
+			</ul>
+			<form class="navbar-form navbar-left" action="/action_page.php">
+				<div class="form-group">
+					<input type="text" class="form-control" placeholder="Search">
+				</div>
+				<button type="submit" class="btn btn-default">Submit</button>
+			</form>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#"><span class="glyphicon glyphicon-user"></span> Account</a></li>
+				<li onclick = "log_out()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+			</ul>
+		</div>
+	</nav>
 
 		
 
