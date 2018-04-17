@@ -57,9 +57,9 @@ $(document).ready(function(){
 
 
 		/********************************************************************************
-		We need to track the current user's voting history for the current question, 
-		as well as each comment under the current question. This needs to be done 
-		in order to prevent the user from voting on the same question/comment more 
+		We need to track the current user's voting history for the current question,
+		as well as each comment under the current question. This needs to be done
+		in order to prevent the user from voting on the same question/comment more
 		than once, unless they're trying to change their vote (from + to - or vice versa)
 		********************************************************************************/
 
@@ -82,10 +82,10 @@ $(document).ready(function(){
 				2. Store the user's vote for that comment 	*/
 		for(let i = 0; i < response.comments.length; i++){
 
-			/*	User may not have voted on a comment, in which case there simply 
-				won't be a corresponding entry in the user_comment_votes array. 
-				That means that we have to check if there is an element 
-				in user_comment_votes whose first element (comment id) matches 
+			/*	User may not have voted on a comment, in which case there simply
+				won't be a corresponding entry in the user_comment_votes array.
+				That means that we have to check if there is an element
+				in user_comment_votes whose first element (comment id) matches
 				the id of the comment we're currently checking */
 
 			var found_a_vote = false;
@@ -93,8 +93,8 @@ $(document).ready(function(){
 			//Iterate through user_comment_votes
 			for(let j = 0; j < response.user_comment_votes.length; j++){
 
-				//	If there's an entry matching the current comment id, 
-				//	add that to page_info.comment_info	
+				//	If there's an entry matching the current comment id,
+				//	add that to page_info.comment_info
 				if(response.user_comment_votes[j][0] == response.comments[i][0]){
 					page_info.comment_info.push({
 						id: response.comments[i][0],
@@ -105,7 +105,7 @@ $(document).ready(function(){
 				}
 			}
 
-			// If there's no entry for the current comment id, 
+			// If there's no entry for the current comment id,
 			// show that user hasn't voted on that comment
 			if(found_a_vote == false){
 				page_info.comment_info.push({
@@ -145,11 +145,22 @@ var vote = function(vote_direction){
 		//Update page_info
 		//Insert new vote into database
 	//}
-
 	//else if(prev_vote != vote_direction){
 		//Update vote count in HTML
 		//Update page_info
 		//Update vote in database
 	//}
 	//console.log(prev_vote);
+}
+
+
+var search = function() {
+
+	var data = {
+		search_value: document.getElementById("search_bar").value
+	}
+
+	post("/search", data, function(response){
+			console.log(response)
+	})
 }

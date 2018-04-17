@@ -19,7 +19,7 @@ $(document).ready(function(){
 
 	username = sessionStorage.getItem("username");
 	//console.log(username);
-	
+
 
 	//Get order data for table from server
 	get("/get_orders", function(response){
@@ -32,7 +32,7 @@ $(document).ready(function(){
 				1. Create an HTML table
 				2. Add order data to table
 		************************************************/
-		
+
 		//Create HTML table
 		for(let i = 0; i < rows; i++){
 			var rowNode = document.createElement("TR");
@@ -62,7 +62,7 @@ $(document).ready(function(){
 			}
 			document.getElementById("order_table").appendChild(rowNode);
 		}
-		
+
 
 		//Call updateTable() every secondsBetweenUpdates seconds
 		tableTimer = window.setInterval(updateTable, secondsBetweenUpdates * 1000);
@@ -79,7 +79,7 @@ $(document).ready(function(){
 		t: 0
 	}});
 }); 	//end of document.ready
-	
+
 
 //This is the function that's called every x seconds to update the table
 var updateTable = function(){
@@ -105,13 +105,15 @@ var pauseData = function(){
 }
 
 
-var place_order = function(order_type){
+var place_order = function(){
 
     var order_info = {
-		amount : document.getElementById('amount').value,
-		price : document.getElementById('price').value,
-		order_type : order_type
+			username: sessionStorage.getItem("username"),
+			order_type : document.getElementById('order_type').value,
+			coin_id : document.getElementById('coin_id_main').value,
+			amount : document.getElementById('price').value
     };
+			console.log(order_info)
 
     post('/submit_order', order_info, function(response){
     	console.log(response)
@@ -119,24 +121,16 @@ var place_order = function(order_type){
 }
 
 
+//Select your cryptocurrency to search_bar:
+// Drop down Button"
 
 
 
+var search = function(){
 
+	var search = document.getElementById('search_text').value
 
-/*
-//Generate data
-var coins = ["BTC", "ETH", "LTC", "XRP", "NEO"];
-var orderLimit = 1000;
-var orders = [];
-for(let i = 0; i < orderLimit; i++){
-	var coinIndex = Math.floor(Math.random() * coins.length);
-	orders.push({
-		coin1: coins[coinIndex],
-		amount1: Math.floor(Math.random() * 100),
-		coin2: coins[coins.length - 1 - coinIndex],
-		amount2: Math.floor(Math.random() * 100)
+	post('/search', {search_text:search}, function(response){
+		console.log(response)
 	});
-	//console.log(orders[orders.length - 1]);
 }
-*/

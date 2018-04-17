@@ -41,7 +41,7 @@
 			vertical-align: top;
 		}
 		#search_bar {
-			width: 30%;
+			width: 20%;
 			height: 90%;
 			float: right;
 			margin: 0.2% 3%;
@@ -109,12 +109,13 @@
 		<div style = "display: inline-block; float: right; background-color: black; width: 0.2%; height: 100%;"></div>
 		<div style = "font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/dashboard">Dashboard</a></div>
 		<input id = "search_bar" type = "text" value = "Search" onclick = "clicked_search_bar()">
+		<input type = "button" style = "width: 60px;" value = "Search" onclick = "search()">
 	</div>
 	<br>
 
-		
 
-	
+
+
 
 
 
@@ -135,8 +136,17 @@
 		<div style = "width: 84%; height: 100%; border: 1px solid red; display: inline-block; vertical-align: top;">This is random garbage text. It doesn't have any value or purpose; it exists solely as a placeholder.</div>
 	</div>
 
-	
-		
+
+
 
 </body>
+
+<script>
+document.getElementById("search_bar").addEventListener("click", function (e) {
+		//if (e.keyCode === 13) {  //checks whether the pressed key is "Enter"
+				console.log(e);
+		//}
+});
+</script>
+
 </html>

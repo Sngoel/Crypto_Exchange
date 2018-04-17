@@ -5,7 +5,7 @@ def insert_into_users(forms):
 
     #Define our connection parameters
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    
+
     #Connect to database
     conn = psycopg2.connect(conn_string)
 
@@ -36,22 +36,23 @@ def insert_into_orders(order_info):
 
     #Initialize cursor
     cur = conn.cursor()
-    coin_id_in = 'LTC'
-    coin_id_out = 'ETH'
-    user_id = 'test'
-    amount_in = order_info['amount']
-    amount_out = order_info['price']
+
+    amount = order_info['amount']
 
     if order_info['order_type'] == 'Buy':
         order_type = 'Buy'
     elif order_info['order_type'] == 'Sell':
         order_type = 'Sell'
 
+        #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + str(order_info['username']) + "'"
 
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
 
     #user_id
 
-    cur.execute("INSERT INTO open_orders (coin_id_out, coin_id_in, order_type ,amount_out, amount_in) VALUES( %s, %s,%s, %s, %s);", (coin_id_out, coin_id_in, order_type, amount_out, amount_in))
+    cur.execute("INSERT INTO open_orders (user_id, coin_id, order_type ,amount, order_time) VALUES( %s, %s, %s, %s, %s);", (user_id, coin_id, order_type ,amount, order_time))
 
     #Destroy connection
     cur.close()

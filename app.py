@@ -77,8 +77,13 @@ def submit_order():
 def validate_login():
 	if login_functions.check_login(request.get_json()):
 		return url_for("dashboard")
-	else: 
+	else:
 		return "false"
+
+@app.route('/search', methods = ['POST'])
+def search():
+	return selects.search(request.get_json())
+
 
 
 

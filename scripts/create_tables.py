@@ -39,13 +39,12 @@ def create_and_populate_tables():
         """CREATE TABLE open_orders(
                 order_id SERIAL PRIMARY KEY,
                 user_id INT REFERENCES users(user_id),
-                coin_id_out VARCHAR(3) REFERENCES coins(coin_id),
-                coin_id_in VARCHAR(3) REFERENCES coins(coin_id),
+                coin_id VARCHAR(3) REFERENCES coins(coin_id),
                 order_type VARCHAR(4),
-                amount_out DECIMAL(12,8),
-                amount_in DECIMAL(12,8))""",
+                amount DECIMAL(12,8)),
+                order_time TIMESTAMP""",
 
-        "INSERT INTO open_orders (user_id, coin_id_out, coin_id_in, order_type, amount_out, amount_in) VALUES " + generate_orders(1000, 4, coins),
+        "INSERT INTO open_orders (user_id, , coin_id, order_type, amount_out, amount_in) VALUES " + generate_orders(1000, 4, coins),
 
 
         """CREATE TABLE categories(
@@ -87,7 +86,7 @@ def create_and_populate_tables():
         ###################################################
         ###   ALL COMMENT-RELATED TABLES AND INSERTS   ###
         ###################################################
-         
+
         """CREATE TABLE comments (
                 comment_id SERIAL PRIMARY KEY,
                 user_id INT REFERENCES users(user_id),
@@ -111,7 +110,7 @@ def create_and_populate_tables():
         "INSERT INTO comment_votes VALUES " + generate_votes(4, 5))
 
 
-        
+
 
 
 
@@ -146,7 +145,7 @@ def array_to_sql_string(array):
 
     sql_string = ""
     for i in range(len(array)):
-        
+
         if i == 0:
             sql_string += "('" + array[i] + "')"
 
@@ -156,7 +155,7 @@ def array_to_sql_string(array):
     return sql_string
 
 
-#This function generates an SQL-formatted string of random 
+#This function generates an SQL-formatted string of random
 # buy/sell orders, which is used to populate the order table
 def generate_orders(number_of_entries, number_of_users, coins):
 
@@ -188,7 +187,7 @@ def generate_orders(number_of_entries, number_of_users, coins):
 
 
 
-#Since the combination of user and question_id needs to be unique, 
+#Since the combination of user and question_id needs to be unique,
 # we can't just randomly generate votes using a random user_id and a random
 # question_id. Since each user can only vote on each question once, we'll just use
 # a nested for loop to get each user to vote randomly on each question.

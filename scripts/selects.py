@@ -6,7 +6,7 @@ from flask import jsonify
 def get_questions():
 	#Define connection parameters
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    
+
     #Connect to database
     conn = psycopg2.connect(conn_string)
 
@@ -43,16 +43,16 @@ def load_thread(request):
 
 
 
-    #Get id, summary description, and vote total for specified question    
-    get_question_info = """ SELECT Q.question_id, Q.question_summary, Q.question_desc, summed.sum 
+    #Get id, summary description, and vote total for specified question
+    get_question_info = """SELECT Q.question_id, Q.question_summary, Q.question_desc, summed.sum
                             FROM questions Q, (
-                                SELECT join1.qid, sum(vote_dir) 
+                                SELECT join1.qid, sum(vote_dir)
                                 FROM (
-                                    SELECT Q.question_id AS qid, Q.question_summary AS q_summ, V.vote_direction AS vote_dir 
-                                    FROM questions Q, question_votes V WHERE Q.question_id = V.question_id) AS join1 
-                                GROUP BY join1.qid) AS summed 
-                            WHERE Q.question_id = summed.qid AND 
-                                  Q.question_id = '""" + question_id + "'"
+                                    SELECT Q.question_id AS qid, Q.question_summary AS q_summ, V.vote_direction AS vote_dir
+                                    FROM questions Q, question_votes V WHERE Q.question_id = V.question_id) AS join1
+                                GROUP BY join1.qid) AS summed
+                            WHERE Q.question_id = summed.qid AND
+                                  Q.question_id = '""" + question_id + "'"""
 
 
 
@@ -61,29 +61,29 @@ def load_thread(request):
 
 
 
-    #Get direction of user's vote for specified question                         
-    get_user_question_vote = """ SELECT question_votes.vote_direction 
+    #Get direction of user's vote for specified question
+    get_user_question_vote = """ SELECT question_votes.vote_direction
                                  FROM question_votes, users
                                  WHERE question_votes.user_id = users.user_id
-                                       AND question_votes.question_id = '""" + question_id + """' 
-                                       AND users.username = '""" + username + "'"
+                                       AND question_votes.question_id = '""" + question_id + """'
+                                       AND users.username = '""" + username + "'"""
 
     cur.execute(get_user_question_vote)
     thread_info['user_question_vote'] = cur.fetchall()
-    
+
 
 
     #Get all comments for specified question
-    get_comments = """  SELECT C.comment_id, C.comment_text, summed.sum 
+    get_comments = """  SELECT C.comment_id, C.comment_text, summed.sum
                         FROM comments C, (
-                            SELECT join1.cid, sum(join1.vote_dir) 
+                            SELECT join1.cid, sum(join1.vote_dir)
                             FROM (
-                                SELECT C.comment_id AS cid, V.vote_direction AS vote_dir 
-                                FROM comments C, comment_votes V 
-                                WHERE C.comment_id = V.comment_id) AS join1 
-                            GROUP BY join1.cid) AS summed 
-                        WHERE C.comment_id = summed.cid AND 
-                              C.question_id = '""" + question_id + "'"
+                                SELECT C.comment_id AS cid, V.vote_direction AS vote_dir
+                                FROM comments C, comment_votes V
+                                WHERE C.comment_id = V.comment_id) AS join1
+                            GROUP BY join1.cid) AS summed
+                        WHERE C.comment_id = summed.cid AND
+                              C.question_id = '""" + question_id + "'"""
 
     cur.execute(get_comments)
     thread_info['comments'] = cur.fetchall()
@@ -91,13 +91,13 @@ def load_thread(request):
 
 
 
-    #Get direction of user's vote for each comment                     
-    get_user_comment_votes = """ SELECT comment_votes.comment_id, comment_votes.vote_direction 
+    #Get direction of user's vote for each comment
+    get_user_comment_votes = """ SELECT comment_votes.comment_id, comment_votes.vote_direction
                                  FROM comment_votes, users, comments
                                  WHERE comment_votes.user_id = users.user_id
                                        AND comment_votes.comment_id = comments.comment_id
-                                       AND comments.question_id = '""" + question_id + """' 
-                                       AND users.username = '""" + username + "'"
+                                       AND comments.question_id = '""" + question_id + """'
+                                       AND users.username = '""" + username + "'"""
 
     cur.execute(get_user_comment_votes)
     thread_info['user_comment_votes'] = cur.fetchall()
@@ -132,3 +132,29 @@ def find_orders():
 
     return SELECT_result
 
+
+
+def search(search_info):
+
+    input = search_info['search_text']
+
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+    questionsearch = "SELECT * FROM questions WHERE question_summary LIKE '%" + input + "%' OR question_desc LIKE '%" + input + "%' "
+    cur.execute(questionsearch)
+    rows = cur.fetchall()
+    print(rows)
+
+    #Destroy connection
+    cur.close()
+    conn.commit()
+    conn.close()
+
+
+
+    return jsonify(rows)
