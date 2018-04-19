@@ -13,9 +13,12 @@ def get_questions():
     #Initialize cursor
     cur = conn.cursor()
 
-    sql = ("SELECT * FROM questions")
+    questions = """ SELECT Q.question_id, Q.question_summary, COALESCE(SUM(V.vote_direction), 0) 
+                    FROM questions Q, question_votes V 
+                    WHERE Q.question_id = V.question_id 
+                    GROUP BY Q.question_id"""
 
-    cur.execute(sql)
+    cur.execute(questions)
     select_result = cur.fetchall()
 
     #Destroy connection
@@ -43,21 +46,21 @@ def load_thread(request):
 
 
 
-    #Get id, summary description, and vote total for specified question    
-    get_question_info = """ SELECT Q.question_id, Q.question_summary, Q.question_desc, summed.sum 
-                            FROM questions Q, (
-                                SELECT join1.qid, SUM(vote_dir)
-                                FROM (
-                                    SELECT Q.question_id AS qid, Q.question_summary AS q_summ, V.vote_direction AS vote_dir 
-                                    FROM questions Q, question_votes V WHERE Q.question_id = V.question_id) AS join1 
-                                GROUP BY join1.qid) AS summed 
-                            WHERE Q.question_id = summed.qid AND 
-                                  Q.question_id = '""" + question_id + "'"
-
-
+    #Get all information in questions table for specified question    
+    get_question_info = "SELECT * FROM questions WHERE question_id = '" + question_id + "'"
 
     cur.execute(get_question_info)
-    thread_info['question'] = cur.fetchall()
+    thread_info['question'] = cur.fetchall()[0]
+
+
+
+    #Get vote count associated with specified question
+    get_question_vote_count = """ SELECT COALESCE(SUM(vote_direction), 0)
+                                  FROM question_votes
+                                  WHERE question_id = '""" + question_id + "'"
+
+    cur.execute(get_question_vote_count)
+    thread_info['question_vote_count'] = cur.fetchall()[0]
 
 
 
@@ -74,20 +77,22 @@ def load_thread(request):
 
 
     #Get all comments for specified question
-    get_comments = """  SELECT C.comment_id, C.comment_text, summed.sum 
-                        FROM comments C, (
-                            SELECT join1.cid, SUM(join1.vote_dir) 
-                            FROM (
-                                SELECT C.comment_id AS cid, V.vote_direction AS vote_dir 
-                                FROM comments C, comment_votes V 
-                                WHERE C.comment_id = V.comment_id) AS join1 
-                            GROUP BY join1.cid) AS summed 
-                        WHERE C.comment_id = summed.cid AND 
-                              C.question_id = '""" + question_id + "'"
+    get_comments = "SELECT * FROM comments WHERE question_id = '" + question_id + "'"
 
     cur.execute(get_comments)
     thread_info['comments'] = cur.fetchall()
 
+
+
+    #Get vote counts for each comment associated with a specific question
+    get_comment_votes = """ SELECT V.comment_id, COALESCE(SUM(V.vote_direction), 0) 
+                            FROM comment_votes V, comments C 
+                            WHERE V.comment_id = C.comment_id AND 
+                                  C.question_id = '""" + question_id + """' 
+                            GROUP BY V.comment_id"""
+                           
+    cur.execute(get_comment_votes)
+    thread_info['comment_votes'] = cur.fetchall()
 
 
 
@@ -123,12 +128,46 @@ def find_orders():
     sql = ("SELECT * FROM open_orders")
 
     cur.execute(sql)
-    SELECT_result = cur.fetchall()
+    select_result = cur.fetchall()
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return SELECT_result
+    return select_result
+
+
+def search(search_info):
+
+    search_text = search_info['search_text']
+
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    search_query = """ SELECT Q.question_id, Q.question_summary, COALESCE(SUM(V.vote_direction), 0) 
+                       FROM questions Q, question_votes V 
+                       WHERE Q.question_id = V.question_id AND 
+                             Q.question_summary LIKE '%""" + search_text + """%' OR 
+                             Q.question_desc LIKE '%""" + search_text + """%' 
+                       GROUP BY Q.question_id"""
+
+    
+    cur.execute(search_query)
+    rows = cur.fetchall()
+    print(rows)
+
+    #Destroy connection
+    cur.close()
+    conn.commit()
+    conn.close()
+
+
+
+    return jsonify(rows)
 

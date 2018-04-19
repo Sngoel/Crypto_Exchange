@@ -1,11 +1,6 @@
 <html>
 <head>
-	<title>0x431 Dashboard</title>
-	<style>
-		table {border: 0.1em solid black;}
-		tr {border: 0.1em solid black;}
-		td {border: 0.1em solid black; padding: 0.2em;}
-	</style>
+	<title>0x431 Forum</title>
 
 
 	<!-- Bootstrap CSS -->
@@ -14,23 +9,33 @@
 	<!-- jQuery -->
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
-	<!-- Plotly -->
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
 	<!-- Our JS -->
 	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
-	<script src = "{{url_for('static', filename='dashboard.js')}}"></script>
+	<script src = "{{url_for('static', filename='search_results.js')}}"></script>
+
+	<style>
+		table {border: 0.1em solid black;}
+		tr {border: 0.1em solid black;}
+		td {border: 0.1em solid black; padding: 0.2em;}
+		.question_container {
+			width: 90%;
+			min-height: 4%;
+			font-size: 150%;
+			margin: 0% 5% 0% 5%;
+			border: 1px solid black;
+		}
+	</style>
 </head>
 <body>
-
+	
 	<nav class="navbar navbar-inverse">
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#"><strong>0x431 Cryptocurrency Exchange</strong></a>
 			</div>
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="/dashboard">Dashboard</a></li>
-				<li><a href="/forum">Forum</a></li>
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li class="active"><a href="/forum">Forum</a></li>
 			</ul>
 			<div class="form-group navbar-form navbar-left">
 				<input type="text" class="form-control " id = "search_bar" placeholder="Search">
@@ -43,37 +48,10 @@
 		</div>
 	</nav>
 
-
-
-	<br><br>
-
-	Amount of Eth:<br>
-	<input type="text" id = 'amount'><br>
-
-	Price:<br>
-	<input type="text" id = 'price'><br>
-
-	<!--      
-	Amount of BTC:<br>
-	<input type="text" name="lastname" value=""><br> -->
 	
-	<br>
-	<input type = "button" value = "Buy Order" onclick = "place_order('Buy')">
-	<input type = "button" value = "Sell Order" onclick = "place_order('Sell')">
 
-	<br><br><br>
+	<!--<iframe width="350" height="430" src="https://console.dialogflow.com/api-client/demo/embedded/63005870-00f4-4f32-89df-9ebdf320a73b"></iframe>-->
 
-
-
-	<input type = "button" style = "font-size: 2em;" value = "Pause data" onclick = "pauseData()">
-
-	<br><br><br>
-
-	<!-- ORDER BOOK TABLE -->
-	<table id = "order_table" style = "display: inline-block;"></table>
-
-	<!-- SAMPLE GRAPH -->
-	<div id = "graph" style="width: 500px; height: 400px; display: inline-block; float: right;"></div>
 
 </body>
 </html>

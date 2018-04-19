@@ -28,13 +28,16 @@ var get = function(url, callback){
 
 
 
-var clicked_search_bar = function(){
+var search = function(){
 
-    var search_bar = document.getElementById("search_bar");
-    
-    if(search_bar.value == "Search"){
-        search_bar.value = "";
-    }
+    //Get user's input from search bar
+    var search_text = document.getElementById('search_bar').value
+
+    //Save search text in cookie
+    sessionStorage.setItem("search_text", search_text);
+
+    //Redirect to search_results.html, which will perform the search on page load
+    window.location = "/search_results";
 }
 
 

@@ -16,93 +16,21 @@
 		table {border: 0.1em solid black;}
 		tr {border: 0.1em solid black;}
 		td {border: 0.1em solid black; padding: 0.2em;}
-		.comment_container {
-			width: 100%;
-			height: 10%;
-			border: 1px solid black;
-			box-sizing: border-box;
-			margin: 2% 0 0 0;
-		}
-		.vote_container {
-			width: 15%;
-			height: 100%;
+		.comment_text_container {
+			width: 80%;
 			display: inline-block;
+			font-size: 150%;
 		}
 		.vote_count_container {
 			width: 40%;
-			height: 100%;
 			display: inline-block;
 			font-size: 250%;
-			padding: 0% 0% 0% 3% ;
+			vertical-align: middle;
 		}
-		.vote_buttons_container {
-			width: 40%;
-			height: 100%;
+		#question_text_container {
+			width: 80%;
 			display: inline-block;
-		}
-		.vote_button {
-			width: 90%;
-			height: 50%;
-		}
-		.comment_text_container {
-			width: 84%;
-			height: 100%;
-			border: 1px solid red;
-			display: inline-block;
-			vertical-align: top;
-		}
-		#search_bar {
-			width: 30%;
-			height: 90%;
-			float: right;
-			margin: 0.2% 3%;
-			padding: 0% 1% 0% 0%;
-			font-size: 1.5em;
-			text-align: right;
-			color: grey;
-		}
-		#header_bar_container {
-			width: 100%;
-			height: 8%;
-			background-color: orange;
-			border: 1px solid black;
-			box-sizing: border-box;
-		}
-		#question_summary {
-			width: 85%;
-			height: 100%;
-			background-color: tan;
-			border: 0.2em solid brown;
-			box-sizing: border-box;
-			font-size: 2em;
-			display: inline-block;
-			float: right;
-			padding-left: 0.75%;
-		}
-		#question_container {
-			border: 1px solid black;
-		}
-		#vote_and_summary_container {
-			height: 10%;
-		}
-		#question_vote_count {
-			display: inline-block;
-			height: 100%;
-			width: 40%;
-			font-size: 250%;
-		}
-		#question_description {
-			width: 85%;
-			margin: 0% 0% 0% 0%;
-			float: right;
-			background-color: tan;
-			border: 1px solid black;
-			box-sizing: border-box;
-			font-size: 1em;
-			padding: 0.5em;
-		}
-		#question_description_container {
-			min-height: 9%;
+			vertical-align: middle;
 		}
 
 	</style>
@@ -117,12 +45,10 @@
 				<li><a href="/dashboard">Dashboard</a></li>
 				<li><a href="/forum">Forum</a></li>
 			</ul>
-			<form class="navbar-form navbar-left" action="/action_page.php">
-				<div class="form-group">
-					<input type="text" class="form-control" placeholder="Search">
-				</div>
-				<button type="submit" class="btn btn-default">Submit</button>
-			</form>
+			<div class="form-group navbar-form navbar-left">
+				<input type="text" class="form-control " id = "search_bar" placeholder="Search">
+				<button type="button" class="btn btn-default" onclick = "search()">Submit</button>
+			</div>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="#"><span class="glyphicon glyphicon-user"></span> Account</a></li>
 				<li onclick = "log_out()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
@@ -130,31 +56,21 @@
 		</div>
 	</nav>
 
-		
 
-	
-
-
-
-
-	<!-- This div should wrap an entire comment, including the vote panel and the text description -->
-	<div class = "comment_container" style = "display: none; width: 100%; height: 10%; border: 1px solid black; box-sizing: border-box; margin: 2% 0 0 0;">
-
-		<!-- Total vote number and upvote/downvote buttons  -->
-		<div style = "width: 15%; height: 100%; border: 1px solid blue; display: inline-block;">
-			<div style = "width: 40%; height: 100%; display: inline-block; font-size: 250%;">166&nbsp;</div>
-			<div style = "width: 40%; height: 100%; display: inline-block;">
-				<input type = "button" style = "width: 90%; height: 50%;" value = "Upvote">
-				<input type = "button" style = "width: 90%; height: 50%;" value = "Downvote">
+	<!-- Question div -->
+	<!--<div class="well well-sm">
+		<div style = "width: 15%; display: inline-block">
+			<div class = "vote_count_container">13</div>
+			<div class="btn-group-vertical" style = "display: inline-block">
+				<button type="button" class="btn btn-success">Upvote</button>
+				<button type="button" class="btn btn-danger">Downvote</button>
 			</div>
 		</div>
-
-		<!-- Comment text -->
-		<div style = "width: 84%; height: 100%; border: 1px solid red; display: inline-block; vertical-align: top;">This is random garbage text. It doesn't have any value or purpose; it exists solely as a placeholder.</div>
-	</div>
-
-	
-		
+		<div id = "question_text_container">
+			<div style = "font-size: 200%;">asdfasdf</div>
+			<div style = "font-size: 100%;">asdfasdf</div>
+		</div>
+	</div>-->
 
 </body>
 </html>

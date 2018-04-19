@@ -37,6 +37,11 @@ def thread():
 	return render_template('thread.html')
 
 
+@app.route('/search_results')
+def search_results():
+	return render_template('search_results.html')
+
+
 
 
 
@@ -44,6 +49,11 @@ def thread():
 ##########################################
 ###      POST/GET REQUEST HANDLERS     ###
 ##########################################
+
+
+@app.route('/search', methods = ['POST'])
+def search():
+	return selects.search(request.get_json())
 
 @app.route('/get_questions', methods = ['POST'])
 def get_questions():

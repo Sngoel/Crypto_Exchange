@@ -23,19 +23,20 @@ $(document).ready(function(){
 
 	post("/load_thread", data, function(response){
 
+		console.log(response);
 
 		//Render all HTML related to the current question
 		var question_html = '';
-		question_html += '<div id = "question_container"><div id = "vote_and_summary_container">';
-		question_html += '<div class = "vote_container"><div id = "question_vote_count">';
-		question_html += response.question[0][3] + '</div>';
-		question_html += '<div class = "vote_buttons_container">';
-		question_html += '<input type = "button" class = "vote_button" value = "Upvote">';
-		question_html += '<input type = "button" class = "vote_button" value = "Downvote">';
-		question_html += '</div></div><div id = "question_summary">';
-		question_html += response.question[0][1] + '</div></div>';
-		question_html += '<div id = "question_description_container"><div id = "question_description">';
-		question_html += response.question[0][2] + '</div></div></div>';
+
+		question_html += '<div class="well well-sm"><div style = "width: 15%; display: inline-block">';
+		question_html += '<div class = "vote_count_container">' + response.question_vote_count[0] + '</div>';
+		question_html += '<div class="btn-group-vertical" style = "display: inline-block">';
+		question_html += '<button type="button" class="btn btn-success">Upvote</button>';
+		question_html += '<button type="button" class="btn btn-danger">Downvote</button>';
+		question_html += '</div></div><div id = "question_text_container">';
+		question_html += '<div style = "font-size: 200%;">' + response.question[2] + '</div>';
+		question_html += '<div style = "font-size: 100%;">' + response.question[3] + '</div>';
+		question_html += '</div></div>';
 
 		document.body.innerHTML += question_html;
 
@@ -43,19 +44,20 @@ $(document).ready(function(){
 		//Render all HTML related to the comments under the current question
 		for(let i = 0; i < response.comments.length; i++){
 			var comment_html = '';
-			comment_html += '<div class = "comment_container" id = "';
-			comment_html += response.comments[i][0] + '"><div class = "vote_container">';
-			comment_html += '<div class = "vote_count_container">'
-			comment_html += response.comments[i][2] + '</div><div class = "vote_buttons_container">';
-			comment_html += '<input type = "button" class = "vote_button" value = "Upvote" onclick = "comment_vote(1)">';
-			comment_html += '<input type = "button" class = "vote_button" value = "Downvote" onclick = "comment_vote(-1)">';
-			comment_html += '</div></div><div class = "comment_text_container">'
-			comment_html += response.comments[i][1] + '</div></div>';
+			comment_html += '<div class="well well-sm" id = "' + response.comments[i][0] + '">';
+			comment_html += '<div style = "width: 15%; display: inline-block;">';
+			comment_html += '<div class = "vote_count_container">' + response.comment_votes[i][1] + '</div>';
+			comment_html += '<div class="btn-group-vertical" style = "display: inline-block;">';
+			comment_html += '<button type="button" class="btn btn-success" onclick = "comment_vote(1)">Upvote</button>';
+			comment_html += '<button type="button" class="btn btn-danger" onclick = "comment_vote(-1)">Downvote</button>';
+			comment_html += '</div></div>';
+			comment_html += '<div class = "comment_text_container">';
+			comment_html += response.comments[i][3] + '</div></div>';
 			document.body.innerHTML += comment_html;
 		}
 
 
-
+	
 
 
 		/********************************************************************************
@@ -141,7 +143,7 @@ var comment_vote = function(vote_direction){
 	if(prev_vote == 0){
 
 		//Update vote count in HTML
-		var vote_count_container = document.getElementById(comment_id).getElementsByClassName("vote_container")[0].getElementsByClassName("vote_count_container")[0];
+		var vote_count_container = document.getElementById(comment_id).children[0].children[0];
 		var current_vote = parseInt(vote_count_container.innerHTML);
 		vote_count_container.innerHTML = current_vote + vote_direction;
 		
@@ -165,7 +167,7 @@ var comment_vote = function(vote_direction){
 	else if(prev_vote != vote_direction){
 
 		//Update vote count in HTML
-		var vote_count_container = document.getElementById(comment_id).getElementsByClassName("vote_container")[0].getElementsByClassName("vote_count_container")[0];
+		var vote_count_container = document.getElementById(comment_id).children[0].children[0];
 		var current_vote = parseInt(vote_count_container.innerHTML);
 		vote_count_container.innerHTML = current_vote + 2 * vote_direction;
 

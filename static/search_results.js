@@ -3,9 +3,12 @@ $(document).ready(function(){
 	//If user is not currently logged in, redirect to landing page
 	check_if_logged_in();
 
-	post("/get_questions", {category: "all"}, function(response){
+	var data = {
+		search_text: sessionStorage.getItem("search_text")
+	}
 
-		console.log(response);
+	post('/search', data, function(response){
+        console.log(response);
 
 		var total_html = '';
 		total_html += '<ul class="list-group" style = "width: 80%; margin: 0% 0% 0% 10%;">';
@@ -23,7 +26,7 @@ $(document).ready(function(){
 
 		total_html += '</ul>';
 		document.body.innerHTML += total_html;
-	});
+    });
 });
 
 
