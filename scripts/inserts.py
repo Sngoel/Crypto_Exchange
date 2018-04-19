@@ -1,6 +1,76 @@
 import psycopg2
 import sys
 
+def submit_question(question_info):
+
+    #Extract parameters from request object
+    username = question_info['username']
+    question_summary = question_info['question_summary']
+    question_description = question_info['question_description']
+    category = question_info['category']
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + username + "'"
+
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+
+    insert = """ INSERT INTO questions (user_id, question_summary, question_desc, category) 
+                 VALUES ('""" + str(user_id) + "', '" + question_summary + "', '" + question_description+ "', '" + str(category) + "')"
+
+    cur.execute(insert)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"
+
+def submit_comment(comment_info):
+
+    #Extract parameters from request object
+    username = comment_info['username']
+    question_id = comment_info['question_id']
+    comment_text = comment_info['comment_text']
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + username + "'"
+
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+
+    insert = """ INSERT INTO comments (user_id, question_id, comment_text) 
+                 VALUES ('""" + str(user_id) + "', '" + str(question_id) + "', '" + comment_text+ "')"
+
+    cur.execute(insert)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"
+
+
 def insert_into_users(forms):
 
     #Define our connection parameters
@@ -53,38 +123,13 @@ def insert_into_orders(order_info):
 
     #user_id
 
-    cur.execute("INSERT INTO open_orders (coin_id_out, coin_id_in, order_type ,amount_out, amount_in) VALUES( %s, %s,%s, %s, %s);", (coin_id_out, coin_id_in, order_type, amount_out, amount_in))
+    cur.execute("INSERT INTO open_orders (coin_id_out, coin_id_in, order_type, amount_out, amount_in) VALUES( %s, %s,%s, %s, %s);", (coin_id_out, coin_id_in, order_type, amount_out, amount_in))
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-
-
-def insert_questions(question_info):
-
-    #Define our connection parameters
-    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-
-    #Connect to database
-    conn = psycopg2.connect(conn_string)
-
-    #Initialize cursor
-    cur = conn.cursor()
-
-
-    user_id = question_info[0]
-    question_summary = question_info[1]
-    question_desc = question_info[2]
-    category = question_info[3]
-
-
-    cur.execute("""INSERT INTO questions(user_id, question_summary, question_desc, category) VALUES(%s, %s, %s, %s);""" ,(user_id, question_summary, question_desc ,category))
-
-    cur.close()
-    conn.commit()
-    conn.close()
 
 
 def insert_comment_vote(vote_info):

@@ -13,20 +13,29 @@ def get_questions():
     #Initialize cursor
     cur = conn.cursor()
 
-    questions = """ SELECT Q.question_id, Q.question_summary, COALESCE(SUM(V.vote_direction), 0) 
-                    FROM questions Q, question_votes V 
-                    WHERE Q.question_id = V.question_id 
-                    GROUP BY Q.question_id"""
+    #Initialize return dictionary
+    questions_info = {}
 
-    cur.execute(questions)
-    select_result = cur.fetchall()
+    #Get all questions
+    get_questions =  "SELECT question_id, question_summary FROM questions"
+
+    cur.execute(get_questions)
+    questions_info['questions'] = cur.fetchall()
+
+    #Get vote totals for all questions
+    get_question_votes = """ SELECT question_id, COALESCE(SUM(vote_direction), 0)
+                             FROM question_votes
+                             GROUP BY question_id """
+
+    cur.execute(get_question_votes)
+    questions_info['question_votes'] = cur.fetchall()
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return select_result
+    return questions_info
 
 
 def load_thread(request):

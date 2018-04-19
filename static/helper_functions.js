@@ -57,3 +57,18 @@ var check_if_logged_in = function(){
         window.location = "/"
     }
 }
+
+var submit_question = function(){
+
+    var data = {
+        username: sessionStorage.getItem("username"),
+        question_summary: document.getElementById("question_summary").value,
+        question_description: document.getElementById("question_description").value,
+        category: "all"
+    }
+
+    post("/submit_question", data, function(response){
+        document.getElementById("question_summary").value = ""
+        document.getElementById("question_description").value = ""
+    });
+}

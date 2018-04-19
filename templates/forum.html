@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 	<!-- jQuery -->
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 	<!-- Our JS -->
 	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
@@ -24,6 +24,13 @@
 			margin: 0% 5% 0% 5%;
 			border: 1px solid black;
 		}
+		.list-group-item:nth-child(odd) {
+			background: #f2f2f2;
+		}
+		.list-group-item:nth-child(even) {
+			background: #e6e6e6;
+		}
+
 	</style>
 </head>
 <body>
@@ -48,7 +55,22 @@
 		</div>
 	</nav>
 
+
+	<div class="container panel panel-default" style = "width: 80%; margin: 0% 0% 3% 10%; padding-bottom: 1%; background-color: WhiteSmoke">
 	
+		<div class="page-header">
+			<h1>Ask a Question</h1>
+		</div>
+		<input type="text" class="form-control " id = "question_summary" placeholder="Question summary">
+		<br>
+		<textarea class="form-control" rows="4" id="question_description" placeholder="Question description"></textarea>
+		<br>
+		<button type="button" class="btn btn-default" style = "float: right;" onclick = "submit_question()">Submit</button>
+
+	</div>
+
+	
+
 
 	<!--<iframe width="350" height="430" src="https://console.dialogflow.com/api-client/demo/embedded/63005870-00f4-4f32-89df-9ebdf320a73b"></iframe>-->
 

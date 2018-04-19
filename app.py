@@ -70,6 +70,14 @@ def get_orders():
 	return jsonify(selects.find_orders())
 
 
+@app.route("/submit_question", methods = ['POST'])
+def submit_question():
+	return jsonify(inserts.submit_question(request.get_json()))
+
+@app.route("/submit_comment", methods = ['POST'])
+def submit_comment():
+	return jsonify(inserts.submit_comment(request.get_json()))
+
 
 #### NEED TO CHECK AND MAKE SURE THIS WAS ACTUALLY SUCCESSFUL ###
 @app.route('/submit_order', methods = ['POST'])
