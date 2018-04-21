@@ -197,3 +197,62 @@ def update_comment_vote(vote_info):
     conn.close()
 
     return "true"
+
+
+def delete_question(question_info):
+
+
+    question_id = question_info['question_id']
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    deletes = [
+        "DELETE FROM question_votes WHERE question_id = " + str(question_id),
+        """DELETE FROM comment_votes WHERE comment_id IN (
+                SELECT comment_id FROM comments WHERE question_id = """ + str(question_id) + ")",
+        "DELETE FROM comments WHERE question_id = " + str(question_id),
+        "DELETE FROM questions WHERE question_id = " + str(question_id)
+    ]
+
+    for delete in deletes:
+        cur.execute(delete)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"
+
+def delete_comment(comment_info):
+
+    comment_id = comment_info['comment_id']
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    deletes = [
+        "DELETE FROM comment_votes WHERE comment_id = " + str(comment_id),
+        "DELETE FROM comments WHERE comment_id = " + str(comment_id)
+    ]
+
+    for delete in deletes:
+        cur.execute(delete)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"

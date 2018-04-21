@@ -1,11 +1,6 @@
-var page_info = {
-	question_info: {
-		id: undefined,
-		user_vote: undefined
-	},
-	user_comment_votes: [],
-	comment_info: []
-}
+
+//Question, comments info will be saved here
+var page_info = {};
 
 
 $(document).ready(function(){
@@ -13,8 +8,6 @@ $(document).ready(function(){
 	//If user is not currently logged in, redirect to landing page
 	check_if_logged_in();
 
-	//Save off question ID
-	page_info.question_info.id = sessionStorage.getItem("question_id");
 
 	//Prepare POST request data object
 	var data = {
@@ -24,9 +17,8 @@ $(document).ready(function(){
 
 	post("/load_thread", data, function(response){
 
+		page_info = response;
 		console.log(response);
-
-
 
 		/********************************************************************************
 		We need to track the current user's voting history for the current question, 
@@ -35,100 +27,23 @@ $(document).ready(function(){
 		than once, unless they're trying to change their vote (from + to - or vice versa)
 		********************************************************************************/
 
-		//Check if user has previously voted on the question
-		if(response.user_question_vote.length == 0){
-
-			//If not, set vote value to zero
-			page_info.question_info.user_vote = 0;
-		}
-
-		//User HAD previously voted on this question
-		else{
-			//Save user's vote direction
-			page_info.question_info.user_vote = response.user_question_vote[0][0];
-		}
-
-
-		/*	For each comment under the current question:
-				1. Store the comment ID
-				2. Store the user's vote for that comment 	*/
-		for(let i = 0; i < response.comments.length; i++){
-
-			/*	User may not have voted on a comment, in which case there simply 
-				won't be a corresponding entry in the user_comment_votes array. 
-				That means that we have to check if there is an element 
-				in user_comment_votes whose first element (comment id) matches 
-				the id of the comment we're currently checking */
-
-			var found_a_vote = false;
-
-			//Iterate through user_comment_votes
-			for(let j = 0; j < response.user_comment_votes.length; j++){
-
-				//	If there's an entry matching the current comment id, 
-				//	add that to page_info.comment_info	
-				if(response.user_comment_votes[j][0] == response.comments[i][0]){
-
-					found_a_vote = true;
-					page_info.user_comment_votes.push({
-						id: response.comments[i][0],
-						vote_direction: response.user_comment_votes[j][1]
-					});
-					break;
-				}
-			}
-
-			// If there's no entry for the current comment id, 
-			// show that user hasn't voted on that comment
-			if(found_a_vote == false){
-				page_info.user_comment_votes.push({
-					id: response.comments[i][0],
-					vote_direction: 0
-				});
-			}
-		}
-
-
-		//Get vote count associated with each comment
-		for(let i = 0; i < response.comments.length; i++){
-
-			var found = false;
-
-			for(let j = 0; j < response.comment_votes.length; j++){
-
-				if(response.comments[i][0] === response.comment_votes[j][0]){
-
-					found = true;
-					page_info.comment_info.push({
-						id: response.comments[i][0],
-						comment_text: response.comments[i][3],
-						vote_total: response.comment_votes[j][1]
-					});
-					break;
-				}
-			}
-
-			if(!found){
-				page_info.comment_info.push({
-					id: response.comments[i][0],
-					comment_text: response.comments[i][3],
-					vote_total: 0
-				});
-			}
-		}
-
 
 		//Render all HTML related to the current question
 		var question_html = '';
 
 		question_html += '<div class="well well-sm" style = "width: 90%; margin-left: 5%;"><div style = "width: 15%; display: inline-block">';
-		question_html += '<div class = "vote_count_container">' + response.question_vote_count[0] + '</div>';
+		question_html += '<div class = "vote_count_container">' + response.question_info.vote_count + '</div>';
 		question_html += '<div class="btn-group-vertical" style = "display: inline-block">';
 		question_html += '<button type="button" class="btn btn-success">Upvote</button>';
 		question_html += '<button type="button" class="btn btn-danger">Downvote</button>';
 		question_html += '</div></div><div id = "question_text_container">';
-		question_html += '<div style = "font-size: 200%;">' + response.question[2] + '</div>';
-		question_html += '<div style = "font-size: 100%;">' + response.question[3] + '</div>';
+		question_html += '<div style = "font-size: 200%;">' + response.question_info.question_summary + '</div>';
+		question_html += '<div style = "font-size: 100%;">' + response.question_info.question_description + '</div>';
+
+		if(page_info.question_info.user_asked_question){
+			question_html += '<button type = "button" class = "btn btn-danger" style = "display: inline-block; float: right;" onclick = "delete_question(event)">Delete</button>';
+		}
+		
 		question_html += '</div></div>';
 
 		document.body.innerHTML += question_html;
@@ -142,17 +57,25 @@ $(document).ready(function(){
 
 
 		//Render all HTML related to the comments under the current question
-		for(let i = 0; i < page_info.comment_info.length; i++){
+		for(let i = 0; i < page_info.comments.length; i++){
 			var comment_html = '';
-			comment_html += '<div class="well well-sm"  style = "width: 90%; margin-left: 5%;" id = "' + page_info.comment_info[i].id + '">';
-			comment_html += '<div style = "width: 15%; display: inline-block;">';
-			comment_html += '<div class = "vote_count_container">' + page_info.comment_info[i].vote_total + '</div>';
-			comment_html += '<div class="btn-group-vertical" style = "display: inline-block;">';
-			comment_html += '<button type="button" class="btn btn-success" onclick = "comment_vote(1)">Upvote</button>';
-			comment_html += '<button type="button" class="btn btn-danger" onclick = "comment_vote(-1)">Downvote</button>';
-			comment_html += '</div></div>';
-			comment_html += '<div class = "comment_text_container">';
-			comment_html += page_info.comment_info[i].comment_text + '</div></div>';
+			comment_html += '<div class="well well-sm"  style = "width: 90%; margin-left: 5%;" id = "' + response.comments[i].comment_id + '">';
+			comment_html += 	'<div style = "width: 15%; display: inline-block;">';
+			comment_html += 		'<div class = "vote_count_container">' + response.comments[i].vote_count + '</div>';
+			comment_html += 		'<div class="btn-group-vertical" style = "display: inline-block;">';
+			comment_html += 			'<button type="button" class="btn btn-success" onclick = "comment_vote(1)">Upvote</button>';
+			comment_html += 			'<button type="button" class="btn btn-danger" onclick = "comment_vote(-1)">Downvote</button>';
+			comment_html += 		'</div>';
+			comment_html += 	'</div>';
+			comment_html += 	'<div class = "comment_text_container">' + response.comments[i].comment_text;
+
+			if(page_info.comments[i].user_posted_comment){
+				comment_html +=	'<button type = "button" class = "btn btn-danger" style = "display: inline-block; float: right;" onclick = "delete_comment(event)">Delete</button>';
+			}
+
+			
+			comment_html += 	'</div>';
+			comment_html += '</div>';
 			document.body.innerHTML += comment_html;
 		}
 	});
@@ -168,10 +91,10 @@ var comment_vote = function(vote_direction){
 	var prev_vote;
 	var comment_index;
 
-	for(let i = 0; i < page_info.user_comment_votes.length; i++){
-		if(page_info.user_comment_votes[i].id == comment_id){
+	for(let i = 0; i < page_info.comments.length; i++){
+		if(page_info.comments[i].comment_id == comment_id){
 			comment_index = i;
-			prev_vote = page_info.user_comment_votes[i].vote_direction;
+			prev_vote = page_info.comments[i].user_comment_vote;
 			break;
 		}
 	}
@@ -185,7 +108,7 @@ var comment_vote = function(vote_direction){
 		vote_count_container.innerHTML = current_vote + vote_direction;
 		
 		//Update page_info
-		page_info.user_comment_votes[comment_index].vote_direction = vote_direction;
+		page_info.comments[comment_index].user_comment_vote = vote_direction;
 
 		//Set up post request data object
 		var data = {
@@ -209,7 +132,7 @@ var comment_vote = function(vote_direction){
 		vote_count_container.innerHTML = current_vote + 2 * vote_direction;
 
 		//Update page_info
-		page_info.user_comment_votes[comment_index].vote_direction = vote_direction;
+		page_info.comments[comment_index].user_comment_vote = vote_direction;
 
 		//Set up post request data object
 		var data = {
@@ -236,4 +159,44 @@ var submit_comment = function(){
 	post("/submit_comment", data, function(response){
 		console.log(response);
 	});
+}
+
+var delete_comment = function(event){
+
+	//Find comment container element
+	var comment_element = event.target.parentNode.parentNode;
+
+	//Find comment_id
+	var comment_id = comment_element.id;
+
+	//Remove corresponding HTML
+	comment_element.parentNode.removeChild(comment_element);
+
+	//Remove from database
+	var data = {
+		comment_id: comment_id
+	}
+
+	post("/delete_comment", data, function(response){
+		console.log(response);
+	});
+
+	//console.log(comment_id);
+}
+
+var delete_question = function(event){
+
+    //Delete from database
+	var data = {
+		question_id: sessionStorage.getItem("question_id")
+	}
+
+	console.log(data);
+
+	post("/delete_question", data, function(response){
+		console.log(response);
+	});
+
+    //Redirect user to forum
+    window.location = "/forum";
 }

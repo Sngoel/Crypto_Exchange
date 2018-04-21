@@ -72,3 +72,4 @@ var submit_question = function(){
         document.getElementById("question_description").value = ""
     });
 }
+

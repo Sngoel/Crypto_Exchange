@@ -78,6 +78,14 @@ def submit_question():
 def submit_comment():
 	return jsonify(inserts.submit_comment(request.get_json()))
 
+@app.route("/delete_question", methods = ['POST'])
+def delete_question():
+	return inserts.delete_question(request.get_json())
+
+@app.route("/delete_comment", methods = ['POST'])
+def delete_comment():
+	return inserts.delete_comment(request.get_json())
+
 
 #### NEED TO CHECK AND MAKE SURE THIS WAS ACTUALLY SUCCESSFUL ###
 @app.route('/submit_order', methods = ['POST'])

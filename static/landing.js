@@ -1,69 +1,46 @@
 var register_toggled = true;
 
-var toggle = function(){
+var login = function(){
 
-	//Toggle to login form; hide email and password fields
-	if(register_toggled){
+	//Save current state
+	register_toggled = false;
 
-		//Save current state
-		register_toggled = false;
-
-		//Make the toggle button say "Create an Account"
-		document.getElementById("toggle").value = "Create an Account"
-
-		//Make the submit button say "Log In"
-		document.getElementById("submit").value = "Log In"
-
-		//Hide email field
-		document.getElementById("email_p").style.display = "None";
-		document.getElementById("email").style.display = "None";
-
-		//Hide confirm password field
-		document.getElementById("confirm_password_p").style.display = "None";
-		document.getElementById("confirm_password").style.display = "None";
-	}
-
-	else{
-
-		//Save current state
-		register_toggled = true;
-
-		//Make the toggle button say "Log In"
-		document.getElementById("toggle").value = "Log In"
-
-		//Make the submit button say "Register"
-		document.getElementById("submit").value = "Register"
-
-		//Restore email field
-		document.getElementById("email_p").style.display = "inline";
-		document.getElementById("email").style.display = "inline";
-
-		//Restore confirm password field
-		document.getElementById("confirm_password_p").style.display = "inline";
-		document.getElementById("confirm_password").style.display = "inline";
-	}
+	//Hide register form
+	document.getElementById("register").style.display = "None";
+	
+	//Show login form
+	document.getElementById("login").style.display = "inline-block";
 };
+
+var register = function(){
+
+	//Save current state
+	register_toggled = true;
+
+	//Hide register form
+	document.getElementById("login").style.display = "None";
+	
+	//Show login form
+	document.getElementById("register").style.display = "inline-block";
+
+}
 
 
 //This function will either create a new user or atttempt to authenticate the given credentials
 //We use the global register_toggled variable to know which operation to attempt.
 var validate = function(){
 
-	//Collect user data from input fields
-	var username = document.getElementById("username").value;
-	var password = document.getElementById("password").value;
-
-	//These will only be used if the user is registering, not logging in
-	var email = document.getElementById("email").value;
-	var confirm_password = document.getElementById("confirm_password").value;
-	
-
-
 	//User is trying to register
-	if (register_toggled){
+	if(register_toggled){
+
+		//Collect user data from input fields
+		var email = document.getElementById("email").value;
+		var username = document.getElementById("register_username").value;
+		var password = document.getElementById("register_password").value;
+		var confirm_password = document.getElementById("confirm_password").value;
 
 		//Alert an error if any fields have been left empty
-		var fields = ["email", "username", "password", "confirm_password"];
+		var fields = ["email", "register_username", "register_password", "confirm_password"];
 
 		for(let i = 0; i < fields.length; i++){
 			if(document.getElementById(fields[i]).value === ""){
@@ -106,6 +83,11 @@ var validate = function(){
 
 	//User is trying to login
 	else {
+
+		//Collect user data from input fields
+		var username = document.getElementById("login_username").value;
+		var password = document.getElementById("login_password").value;
+
 
 		//Make sure fields aren't empty
 		if(username === "" || password === ""){

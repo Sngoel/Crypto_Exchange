@@ -38,6 +38,8 @@ $(document).ready(function(){
 
 		}
 
+		document.getElementById("submit_question_container").style.display = "block";
+
 		var total_html = '';
 		total_html += '<ul class="list-group" style = "width: 80%; margin: 0% 0% 0% 10%;">';
 

@@ -49,18 +49,30 @@ def load_thread(request):
     username = request['username']
     question_id = request['question_id']
 
+    #Get user_id from username
+    cur.execute("SELECT user_id FROM users WHERE username = '" + username + "'")
+    user_id = cur.fetchall()[0][0]
 
-    #Initialize return dictionary
-    thread_info = {}
 
 
+
+    #Initialize dictionary for storing question information
+    question_info = {
+        'user_asked_question': 0
+    }
 
     #Get all information in questions table for specified question    
-    get_question_info = "SELECT * FROM questions WHERE question_id = '" + question_id + "'"
+    cur.execute("SELECT * FROM questions WHERE question_id = '" + question_id + "'")
+    result_set = cur.fetchall()[0]
 
-    cur.execute(get_question_info)
-    thread_info['question'] = cur.fetchall()[0]
+    question_info['question_id'] = result_set[0]
+    question_info['question_summary'] = result_set[2]
+    question_info['question_description'] = result_set[3]
+    question_info['question_category'] = result_set[4]
 
+    #Indicate if user_id's match
+    if result_set[1] == user_id:
+        question_info['user_asked_question'] = 1
 
 
     #Get vote count associated with specified question
@@ -69,28 +81,52 @@ def load_thread(request):
                                   WHERE question_id = '""" + question_id + "'"
 
     cur.execute(get_question_vote_count)
-    thread_info['question_vote_count'] = cur.fetchall()[0]
-
+    question_info['vote_count'] = cur.fetchall()[0][0]
 
 
     #Get direction of user's vote for specified question                         
-    get_user_question_vote = """ SELECT question_votes.vote_direction 
-                                 FROM question_votes, users
-                                 WHERE question_votes.user_id = users.user_id
-                                       AND question_votes.question_id = '""" + question_id + """' 
-                                       AND users.username = '""" + username + "'"
+    get_user_question_vote = """ SELECT V.vote_direction 
+                                 FROM question_votes V, users U
+                                 WHERE V.user_id = U.user_id
+                                       AND V.question_id = '""" + question_id + """' 
+                                       AND U.username = '""" + username + "'"
 
     cur.execute(get_user_question_vote)
-    thread_info['user_question_vote'] = cur.fetchall()
+
+    result_set = cur.fetchall()
+
+    if len(result_set) == 0:
+        question_info['user_question_vote'] = 0
+
+    else:
+        question_info['user_question_vote'] = result_set[0]
+
     
 
 
-    #Get all comments for specified question
-    get_comments = "SELECT * FROM comments WHERE question_id = '" + question_id + "'"
 
-    cur.execute(get_comments)
-    thread_info['comments'] = cur.fetchall()
 
+
+    #Initialize list for holding information about comments for the current question
+    comments = []
+
+    #Get all information from comments table for current question
+    cur.execute("SELECT comment_id, user_id, comment_text FROM comments WHERE question_id = '" + question_id + "'")
+
+    result_set = cur.fetchall()
+
+    for comment in result_set:
+
+        user_posted_comment = 0
+
+        if comment[1] == user_id:
+            user_posted_comment = 1
+
+        comments.append({
+            'comment_id': comment[0],
+            'comment_text': comment[2],
+            'user_posted_comment': user_posted_comment
+        })
 
 
     #Get vote counts for each comment associated with a specific question
@@ -101,26 +137,55 @@ def load_thread(request):
                             GROUP BY V.comment_id"""
                            
     cur.execute(get_comment_votes)
-    thread_info['comment_votes'] = cur.fetchall()
+    comment_vote_counts = cur.fetchall()
 
+    #Add vote_count attribute to comments list
+    for comment in comments:
+        found = False
+
+        for comment_vote_count in comment_vote_counts:
+            if comment['comment_id'] == comment_vote_count[0]:
+                found = True
+                comment['vote_count'] = comment_vote_count[1]
+                break
+
+        if found == False:
+            comment['vote_count'] = 0
 
 
     #Get direction of user's vote for each comment                     
-    get_user_comment_votes = """ SELECT comment_votes.comment_id, comment_votes.vote_direction 
-                                 FROM comment_votes, users, comments
-                                 WHERE comment_votes.user_id = users.user_id
-                                       AND comment_votes.comment_id = comments.comment_id
-                                       AND comments.question_id = '""" + question_id + """' 
-                                       AND users.username = '""" + username + "'"
+    get_user_comment_votes = """ SELECT V.comment_id, V.vote_direction 
+                                 FROM comment_votes V, comments C
+                                 WHERE V.user_id = '""" + str(user_id) + """' AND 
+                                       V.comment_id = C.comment_id AND
+                                       C.question_id = '""" + str(question_id) + "'"
 
     cur.execute(get_user_comment_votes)
-    thread_info['user_comment_votes'] = cur.fetchall()
+    user_comment_votes = cur.fetchall()
+    #Add user's vote direction as attribute to comments list
+    for comment in comments:
+        found = False
+
+        for user_comment_vote in user_comment_votes:
+            if comment['comment_id'] == user_comment_vote[0]:
+                found = True
+                comment['user_comment_vote'] = user_comment_vote[1]
+                break
+
+        if found == False:
+            comment['user_comment_vote'] = 0
 
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
+
+    #Encapsulate all information into one dictionary
+    thread_info = {
+        'question_info': question_info,
+        'comments': comments
+    }
 
     return thread_info
 
