@@ -64,11 +64,21 @@ def submit_comment(comment_info):
 
     cur.execute(insert)
 
+    #Get comment_id to return to client
+    get_comment_id = """ SELECT comment_id 
+                         FROM comments
+                         WHERE user_id = '""" + str(user_id) + """' AND 
+                               comment_text = '""" + comment_text + "'"
+
+    cur.execute(get_comment_id)
+
+    comment_id = cur.fetchall()[0][0]
+
     cur.close()
     conn.commit()
     conn.close()
 
-    return "true"
+    return comment_id
 
 
 def insert_into_users(forms):

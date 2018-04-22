@@ -46,15 +46,16 @@ $(document).ready(function(){
 		
 		question_html += '</div></div>';
 
-		document.body.innerHTML += question_html;
+		//document.body.innerHTML += question_html;
+		document.getElementById("question").innerHTML += question_html;
 
 		var comment_form = '';
 		comment_form += '<div class = "well well-sm" style = "width: 90%; margin-left: 5%;">';
 		comment_form += '<input type="text" style = "display: inline-block; width: 93%;" class="form-control" id = "new_comment" placeholder="Comment">';
 		comment_form += '<button type="button" class="btn btn-default" style = "display: inline-block; float: right;" onclick = "submit_comment()">Submit</button>';
 		comment_form += '</div>';
-		document.body.innerHTML += comment_form;
-
+		//document.body.innerHTML += comment_form;
+		document.getElementById("question").innerHTML += comment_form;
 
 		//Render all HTML related to the comments under the current question
 		for(let i = 0; i < page_info.comments.length; i++){
@@ -76,7 +77,8 @@ $(document).ready(function(){
 			
 			comment_html += 	'</div>';
 			comment_html += '</div>';
-			document.body.innerHTML += comment_html;
+			//document.body.innerHTML += comment_html;
+			document.getElementById("comments").innerHTML += comment_html;
 		}
 	});
 });
@@ -158,6 +160,32 @@ var submit_comment = function(){
 
 	post("/submit_comment", data, function(response){
 		console.log(response);
+
+		page_info.comments.push({
+			comment_id: response,
+			comment_text: document.getElementById("new_comment").value,
+			user_comment_vote: 0,
+			vote_count: 0,
+			user_posted_comment: 1
+		});
+
+		var comment_html = '';
+		comment_html += '<div class="well well-sm"  style = "width: 90%; margin-left: 5%;" id = "' + response + '">';
+		comment_html += 	'<div style = "width: 15%; display: inline-block;">';
+		comment_html += 		'<div class = "vote_count_container">0</div>';
+		comment_html += 		'<div class="btn-group-vertical" style = "display: inline-block;">';
+		comment_html += 			'<button type="button" class="btn btn-success" onclick = "comment_vote(1)">Upvote</button>';
+		comment_html += 			'<button type="button" class="btn btn-danger" onclick = "comment_vote(-1)">Downvote</button>';
+		comment_html += 		'</div>';
+		comment_html += 	'</div>';
+		comment_html += 	'<div class = "comment_text_container">' + document.getElementById("new_comment").value;
+		comment_html +=	'<button type = "button" class = "btn btn-danger" style = "display: inline-block; float: right;" onclick = "delete_comment(event)">Delete</button>';
+		comment_html += 	'</div>';
+		comment_html += '</div>';
+
+		document.getElementById("comments").innerHTML = comment_html + document.getElementById("comments").innerHTML;
+		document.getElementById("new_comment").value = "";
+
 	});
 }
 
@@ -178,7 +206,14 @@ var delete_comment = function(event){
 	}
 
 	post("/delete_comment", data, function(response){
-		console.log(response);
+
+		//Remove comment metadata from page_info.comments
+		for(let i = 0; i < page_info.comments.length; i++){
+			if(page_info.comments[i].comment_id == comment_id){
+				page_info.comments.splice(i, 1);
+				break;
+			}
+		}
 	});
 
 	//console.log(comment_id);
