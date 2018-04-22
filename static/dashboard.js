@@ -36,6 +36,28 @@ $(document).ready(function(){
 				2. Add order data to table
 		************************************************/
 		
+
+		/*var table_html = '';
+
+		table_html += ` <thead>
+							<tr>
+								<th>Column 1</th>
+								<th>Column 2</th>
+								<th>Column 3</th>
+							</tr>
+						</thead>
+						<tbody>`
+
+		for(let i = 0; i < rows; i++){
+
+			table_html += '<tr>';
+			for(let j = 0; j < columns; j++){
+				table_html += '<td>' +  +'</td>';
+			}
+		}*/
+
+
+
 		//Create HTML table
 		for(let i = 0; i < rows; i++){
 			var rowNode = document.createElement("TR");
@@ -46,7 +68,7 @@ $(document).ready(function(){
 
 				var text = order_data[i][column_mapping[j]];
 
-				/*var text;
+				var text;
 				if(j == 0){
 					text = order_data[i][4];
 				}
@@ -57,7 +79,7 @@ $(document).ready(function(){
 
 				else if(j == 2){
 					text = order_data[i][5];
-				}*/
+				}
 
 				var textNode = document.createTextNode(order_data[i][column_mapping[j]]);
 				dataCellNode.appendChild(textNode);

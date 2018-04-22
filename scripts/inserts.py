@@ -30,11 +30,22 @@ def submit_question(question_info):
 
     cur.execute(insert)
 
+    #Get question_id to return to client
+    get_question_id = """ SELECT question_id 
+                         FROM questions
+                         WHERE user_id = '""" + str(user_id) + """' AND 
+                               question_summary = '""" + question_summary + """' AND
+                               question_desc = '""" + question_description + "'"
+
+    cur.execute(get_question_id)
+
+    question_id = cur.fetchall()[0][0]
+
     cur.close()
     conn.commit()
     conn.close()
 
-    return "true"
+    return question_id
 
 def submit_comment(comment_info):
 
@@ -260,6 +271,74 @@ def delete_comment(comment_info):
 
     for delete in deletes:
         cur.execute(delete)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"
+
+
+
+def insert_question_vote(question_info):
+
+    username = question_info['username']
+    question_id = question_info['question_id']
+    vote_direction = question_info['vote_direction']
+
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + str(question_info['username']) + "'"
+
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+
+    insert = "INSERT INTO question_votes (user_id, question_id, vote_direction) VALUES (" + str(user_id) + ", " + str(question_id) + ", " + str(vote_direction) + ")"
+
+    cur.execute(insert)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return "true"
+
+
+def update_question_vote(question_info):
+
+    username = question_info['username']
+    question_id = question_info['question_id']
+    vote_direction = question_info['vote_direction']
+
+
+    #Define our connection parameters
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+
+    #Connect to database
+    conn = psycopg2.connect(conn_string)
+
+    #Initialize cursor
+    cur = conn.cursor()
+
+    #Get user_id
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + str(username) + "'"
+
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+    update = "UPDATE question_votes SET vote_direction = " + str(vote_direction) + " WHERE question_id = " + str(question_id) + " AND user_id = " + str(user_id)
+
+    cur.execute(update)
 
     cur.close()
     conn.commit()

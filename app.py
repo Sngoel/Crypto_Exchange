@@ -53,7 +53,7 @@ def search_results():
 
 @app.route('/search', methods = ['POST'])
 def search():
-	return selects.search(request.get_json())
+	return jsonify(selects.search(request.get_json()))
 
 @app.route('/get_questions', methods = ['POST'])
 def get_questions():
@@ -120,6 +120,14 @@ def insert_comment_vote():
 	return inserts.insert_comment_vote(request.get_json())
 
 
+@app.route('/update_question_vote', methods = ['POST'])
+def update_question_vote():
+	return inserts.update_question_vote(request.get_json())
+
+
+@app.route('/insert_question_vote', methods = ['POST'])
+def insert_question_vote():
+	return inserts.insert_question_vote(request.get_json())
 
 
 

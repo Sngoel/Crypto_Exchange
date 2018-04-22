@@ -2,9 +2,20 @@
 <head>
 	<title>0x431 Dashboard</title>
 	<style>
-		table {border: 0.1em solid black;}
+		body {
+			background-image: url("http://www.access4.eu/_media/india_hg.jpg");
+			background-size: 100% 100%;
+		}
+		#order_table {
+			display: inline-block;
+			float: right;
+			margin-right: 5%;
+			width: 30%;
+		}
+		/*table {border: 0.1em solid black;}
 		tr {border: 0.1em solid black;}
-		td {border: 0.1em solid black; padding: 0.2em;}
+		td {border: 0.1em solid black; padding: 0.2em;}*/
+
 	</style>
 
 
@@ -70,10 +81,10 @@
 	<br><br><br>
 
 	<!-- ORDER BOOK TABLE -->
-	<table id = "order_table" style = "display: inline-block;"></table>
+	<table class = "table" id = "order_table"></table>
 
 	<!-- SAMPLE GRAPH -->
-	<div id = "graph" style="width: 500px; height: 400px; display: inline-block; float: right;"></div>
+	<div id = "graph" style="width: 500px; height: 400px; display: none; float: right;"></div>
 
 </body>
 </html>

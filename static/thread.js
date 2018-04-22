@@ -20,22 +20,14 @@ $(document).ready(function(){
 		page_info = response;
 		console.log(response);
 
-		/********************************************************************************
-		We need to track the current user's voting history for the current question, 
-		as well as each comment under the current question. This needs to be done 
-		in order to prevent the user from voting on the same question/comment more 
-		than once, unless they're trying to change their vote (from + to - or vice versa)
-		********************************************************************************/
-
 
 		//Render all HTML related to the current question
 		var question_html = '';
-
 		question_html += '<div class="well well-sm" style = "width: 90%; margin-left: 5%;"><div style = "width: 15%; display: inline-block">';
-		question_html += '<div class = "vote_count_container">' + response.question_info.vote_count + '</div>';
+		question_html += '<div id = "vote_count" class = "vote_count_container">' + response.question_info.vote_count + '</div>';
 		question_html += '<div class="btn-group-vertical" style = "display: inline-block">';
-		question_html += '<button type="button" class="btn btn-success">Upvote</button>';
-		question_html += '<button type="button" class="btn btn-danger">Downvote</button>';
+		question_html += '<button type="button" class="btn btn-success" onclick = "question_vote(1)">Upvote</button>';
+		question_html += '<button type="button" class="btn btn-danger" onclick = "question_vote(-1)">Downvote</button>';
 		question_html += '</div></div><div id = "question_text_container">';
 		question_html += '<div style = "font-size: 200%;">' + response.question_info.question_summary + '</div>';
 		question_html += '<div style = "font-size: 100%;">' + response.question_info.question_description + '</div>';
@@ -83,72 +75,6 @@ $(document).ready(function(){
 	});
 });
 
-
-var comment_vote = function(vote_direction){
-
-	//Find comment_id of the comment that the user voted on
-	var comment_id = event.target.parentNode.parentNode.parentNode.id;
-
-	//Check if the user had already voted in the SAME DIRECTION as the attempted vote
-	var prev_vote;
-	var comment_index;
-
-	for(let i = 0; i < page_info.comments.length; i++){
-		if(page_info.comments[i].comment_id == comment_id){
-			comment_index = i;
-			prev_vote = page_info.comments[i].user_comment_vote;
-			break;
-		}
-	}
-
-
-	if(prev_vote == 0){
-
-		//Update vote count in HTML
-		var vote_count_container = document.getElementById(comment_id).children[0].children[0];
-		var current_vote = parseInt(vote_count_container.innerHTML);
-		vote_count_container.innerHTML = current_vote + vote_direction;
-		
-		//Update page_info
-		page_info.comments[comment_index].user_comment_vote = vote_direction;
-
-		//Set up post request data object
-		var data = {
-			username: sessionStorage.getItem("username"),
-			comment_id: comment_id,
-			vote_direction: vote_direction
-		};
-
-		//Send request to server
-		post("/insert_comment_vote", data, function(response){
-			console.log(response);
-		});
-
-	}
-
-	else if(prev_vote != vote_direction){
-
-		//Update vote count in HTML
-		var vote_count_container = document.getElementById(comment_id).children[0].children[0];
-		var current_vote = parseInt(vote_count_container.innerHTML);
-		vote_count_container.innerHTML = current_vote + 2 * vote_direction;
-
-		//Update page_info
-		page_info.comments[comment_index].user_comment_vote = vote_direction;
-
-		//Set up post request data object
-		var data = {
-			username: sessionStorage.getItem("username"),
-			comment_id: comment_id,
-			vote_direction: vote_direction
-		};
-
-		//Send request to server
-		post("/update_comment_vote", data, function(response){
-			console.log(response);
-		});
-	}
-}
 
 var submit_comment = function(){
 
@@ -234,4 +160,119 @@ var delete_question = function(event){
 
     //Redirect user to forum
     window.location = "/forum";
+}
+
+
+
+
+var question_vote = function(vote_direction){
+
+	if(page_info.question_info.user_question_vote == 0){
+
+		//Update HTML
+		var current_vote = parseInt(document.getElementById("vote_count").innerHTML);
+		document.getElementById("vote_count").innerHTML = current_vote + 2 * vote_direction;
+
+		//Update page_info.question_info
+		page_info.question_info.user_question_vote = vote_direction;
+
+		//Update database
+		var data = {
+			username: sessionStorage.getItem("username"),
+			question_id: sessionStorage.getItem("question_id"),
+			vote_direction: vote_direction
+		}
+
+		post("/insert_question_vote", data, function(response){
+			console.log(response);
+		});
+	}
+
+	else if(page_info.question_info.user_question_vote != vote_direction){
+
+		//Update HTML
+		var current_vote = parseInt(document.getElementById("vote_count").innerHTML);
+		document.getElementById("vote_count").innerHTML = current_vote + 2 * vote_direction;
+
+		//Update page_info.question_info
+		page_info.question_info.user_question_vote = vote_direction;
+
+		//Update database
+		var data = {
+			username: sessionStorage.getItem("username"),
+			question_id: sessionStorage.getItem("question_id"),
+			vote_direction: vote_direction
+		}
+
+		post("/update_question_vote", data, function(response){
+			console.log(response);
+		});
+	}
+}
+
+
+var comment_vote = function(vote_direction){
+
+	//Find comment_id of the comment that the user voted on
+	var comment_id = event.target.parentNode.parentNode.parentNode.id;
+
+	//Check if the user had already voted in the SAME DIRECTION as the attempted vote
+	var prev_vote;
+	var comment_index;
+
+	for(let i = 0; i < page_info.comments.length; i++){
+		if(page_info.comments[i].comment_id == comment_id){
+			comment_index = i;
+			prev_vote = page_info.comments[i].user_comment_vote;
+			break;
+		}
+	}
+
+
+	if(prev_vote == 0){
+
+		//Update vote count in HTML
+		var vote_count_container = document.getElementById(comment_id).children[0].children[0];
+		var current_vote = parseInt(vote_count_container.innerHTML);
+		vote_count_container.innerHTML = current_vote + vote_direction;
+		
+		//Update page_info
+		page_info.comments[comment_index].user_comment_vote = vote_direction;
+
+		//Set up post request data object
+		var data = {
+			username: sessionStorage.getItem("username"),
+			comment_id: comment_id,
+			vote_direction: vote_direction
+		};
+
+		//Send request to server
+		post("/insert_comment_vote", data, function(response){
+			console.log(response);
+		});
+
+	}
+
+	else if(prev_vote != vote_direction){
+
+		//Update vote count in HTML
+		var vote_count_container = document.getElementById(comment_id).children[0].children[0];
+		var current_vote = parseInt(vote_count_container.innerHTML);
+		vote_count_container.innerHTML = current_vote + 2 * vote_direction;
+
+		//Update page_info
+		page_info.comments[comment_index].user_comment_vote = vote_direction;
+
+		//Set up post request data object
+		var data = {
+			username: sessionStorage.getItem("username"),
+			comment_id: comment_id,
+			vote_direction: vote_direction
+		};
+
+		//Send request to server
+		post("/update_comment_vote", data, function(response){
+			console.log(response);
+		});
+	}
 }

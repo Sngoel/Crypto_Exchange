@@ -4,23 +4,26 @@ from flask import jsonify
 
 
 def get_questions():
+
 	#Define connection parameters
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    
-    #Connect to database
     conn = psycopg2.connect(conn_string)
-
-    #Initialize cursor
     cur = conn.cursor()
 
-    #Initialize return dictionary
-    questions_info = {}
+    #Initialize array of questions
+    questions = []
 
     #Get all questions
     get_questions =  "SELECT question_id, question_summary FROM questions"
 
     cur.execute(get_questions)
-    questions_info['questions'] = cur.fetchall()
+    result_set = cur.fetchall()
+
+    for question in result_set:
+        questions.append({
+                'question_id': question[0],
+                'question_summary': question[1]
+            })
 
     #Get vote totals for all questions
     get_question_votes = """ SELECT question_id, COALESCE(SUM(vote_direction), 0)
@@ -28,14 +31,86 @@ def get_questions():
                              GROUP BY question_id """
 
     cur.execute(get_question_votes)
-    questions_info['question_votes'] = cur.fetchall()
+    result_set = cur.fetchall()
+
+    for question in questions:
+        found = False
+
+        for question_vote in result_set:
+            if question['question_id'] == question_vote[0]:
+                found = True
+                question['vote_count'] = question_vote[1]
+                break
+
+        if found == False:
+            question['vote_count'] = 0
+
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return questions_info
+    return questions
+
+
+
+def search(search_info):
+
+    search_text = search_info['search_text']
+
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+    conn = psycopg2.connect(conn_string)
+    cur = conn.cursor()
+
+    questions = []
+
+    search_query = """ SELECT question_id, question_summary
+                       FROM questions
+                       WHERE question_summary LIKE '%""" + search_text + """%' OR 
+                             question_desc LIKE '%""" + search_text + "%'"
+
+    cur.execute(search_query)
+    result_set = cur.fetchall()
+
+    for question in result_set:
+        questions.append({
+            'question_id': question[0],
+            'question_summary': question[1]
+            })
+
+    #Get question votes
+    get_question_votes = """ SELECT question_id, COALESCE(SUM(vote_direction), 0)
+                             FROM question_votes
+                             WHERE question_id IN (
+                                SELECT question_id
+                                FROM questions
+                                WHERE question_summary LIKE '%""" + search_text + """%' OR 
+                                      question_desc LIKE '%""" + search_text + """%')
+                             GROUP BY question_id"""
+
+    cur.execute(get_question_votes)
+    result_set = cur.fetchall()
+
+    for question in questions:
+        found = False
+
+        for question_vote in result_set:
+            if question['question_id'] == question_vote[0]:
+                found = True
+                question['vote_count'] = question_vote[1]
+                break
+
+        if found == False:
+            question['vote_count'] = 0
+
+
+    #Destroy connection
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return questions
 
 
 def load_thread(request):
@@ -99,7 +174,7 @@ def load_thread(request):
         question_info['user_question_vote'] = 0
 
     else:
-        question_info['user_question_vote'] = result_set[0]
+        question_info['user_question_vote'] = result_set[0][0]
 
     
 
@@ -212,36 +287,5 @@ def find_orders():
     return select_result
 
 
-def search(search_info):
 
-    search_text = search_info['search_text']
-
-    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-
-    #Connect to database
-    conn = psycopg2.connect(conn_string)
-
-    #Initialize cursor
-    cur = conn.cursor()
-
-    search_query = """ SELECT Q.question_id, Q.question_summary, COALESCE(SUM(V.vote_direction), 0) 
-                       FROM questions Q, question_votes V 
-                       WHERE Q.question_id = V.question_id AND 
-                             Q.question_summary LIKE '%""" + search_text + """%' OR 
-                             Q.question_desc LIKE '%""" + search_text + """%' 
-                       GROUP BY Q.question_id"""
-
-    
-    cur.execute(search_query)
-    rows = cur.fetchall()
-    print(rows)
-
-    #Destroy connection
-    cur.close()
-    conn.commit()
-    conn.close()
-
-
-
-    return jsonify(rows)
 

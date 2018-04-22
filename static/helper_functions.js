@@ -68,6 +68,14 @@ var submit_question = function(){
     }
 
     post("/submit_question", data, function(response){
+
+        var question_html = '';
+        question_html += '<li class = "list-group-item" onclick = "select_thread(event)" id = "';
+        question_html += response + '">' + document.getElementById("question_summary").value;
+        question_html += '<span class="badge">0</span></li>';
+
+        document.getElementById("questions").innerHTML = question_html + document.getElementById("questions").innerHTML;
+
         document.getElementById("question_summary").value = ""
         document.getElementById("question_description").value = ""
     });
