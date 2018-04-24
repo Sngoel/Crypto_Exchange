@@ -179,9 +179,6 @@ def load_thread(request):
     
 
 
-
-
-
     #Initialize list for holding information about comments for the current question
     comments = []
 
@@ -264,27 +261,99 @@ def load_thread(request):
 
     return thread_info
 
-def find_orders():
-    #Define our connection parameters
+def find_orders(info):
+
+    #Extract parameter
+    coin_type = info['coin_type']
+    print(coin_type)
+
+    #Set up database connection
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-
-    #Connect to database
     conn = psycopg2.connect(conn_string)
-
-    #Initialize cursor
     cur = conn.cursor()
 
-    sql = ("SELECT * FROM open_orders")
+    cur.execute(""" SELECT order_type, amount, price 
+                    FROM open_orders 
+                    WHERE coin_id = '""" + coin_type + """'
+                    ORDER BY ts DESC """)
 
-    cur.execute(sql)
     select_result = cur.fetchall()
+    orders = []
+
+    for order in select_result:
+        orders.append({
+            'order_type': order[0],
+            'order_amount': order[1],
+            'order_price': order[2]
+        })
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return select_result
+    return orders
+
+
+def get_balances(user_name):
+    
+    #Extract parameter
+    username = user_name['username']
+
+    #Set up connection to database
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+    conn = psycopg2.connect(conn_string)
+    cur = conn.cursor()
+
+    #Get user_id from username
+    cur.execute("SELECT user_id FROM users WHERE username = '" + username + "'")
+    user_id = cur.fetchall()[0][0]
+
+
+    sql = ("""SELECT coin_id, coin_balance
+            FROM balances as b
+            Where b.user_id = '"""+ str(user_id) + "'" )
+
+    cur.execute(sql)
+    SELECT_result = cur.fetchall()
+
+    #Destroy connection
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return SELECT_result
+
+
+def get_history(user_name):
+
+    #Extract parameter
+    username = user_name['username']
+
+    #Set up connection to database
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+    conn = psycopg2.connect(conn_string)
+    cur = conn.cursor()
+
+    #Get user_id from username
+    cur.execute("SELECT user_id FROM users WHERE username = '" + username + "'")
+    user_id = cur.fetchall()[0][0]
+
+
+    sql = ("""SELECT *
+            FROM successful_orders as s
+            Where s.maker_user_id = '""" + str(user_id) + """' OR s.fulfiller_user_id = '""" + str(user_id) + "'" )
+
+    cur.execute(sql)
+    SELECT_result = cur.fetchall()
+
+    #Destroy connection
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    return SELECT_result
+
 
 
 

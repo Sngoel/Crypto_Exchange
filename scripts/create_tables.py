@@ -2,8 +2,8 @@ import psycopg2
 import sys
 from random import randint
 
+from inserts import coins
 
-coins = ['BTC', 'ETH', 'XRP', 'BCH', 'LTC', 'EOS', 'ADA', 'XLM', 'NEO', 'XMR']
 
 
 def create_and_populate_tables():
@@ -36,16 +36,31 @@ def create_and_populate_tables():
 
         "INSERT INTO coins (coin_id) VALUES " + array_to_sql_string(coins),
 
+        """CREATE TABLE balances(
+                user_id INT REFERENCES users(user_id),
+                coin_id VARCHAR(3) REFERENCES coins(coin_id),
+                coin_balance DECIMAL)""",
+
         """CREATE TABLE open_orders(
                 order_id SERIAL PRIMARY KEY,
                 user_id INT REFERENCES users(user_id),
-                coin_id_out VARCHAR(3) REFERENCES coins(coin_id),
-                coin_id_in VARCHAR(3) REFERENCES coins(coin_id),
                 order_type VARCHAR(4),
-                amount_out DECIMAL(12,8),
-                amount_in DECIMAL(12,8))""",
+                coin_id VARCHAR(3) REFERENCES coins(coin_id),
+                amount DECIMAL(12,8),
+                price DECIMAL(12,8),
+                ts timestamp )""",
 
-        "INSERT INTO open_orders (user_id, coin_id_out, coin_id_in, order_type, amount_out, amount_in) VALUES " + generate_orders(1000, 4, coins),
+        "INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts) VALUES " + generate_orders(1000, 4, coins),
+
+        """CREATE TABLE successful_orders(
+                order_id SERIAL PRIMARY KEY,
+                maker_user_id INT REFERENCES users(user_id),
+                fulfiller_user_id INT REFERENCES users(user_id),
+                order_type VARCHAR(4),
+                coin_id VARCHAR(3) REFERENCES coins(coin_id),
+                amount DECIMAL(12,8),
+                price DECIMAL(12,8),
+                ts timestamp )""",
 
 
         """CREATE TABLE categories(
@@ -140,7 +155,7 @@ def array_to_sql_string(array):
     return sql_string
 
 
-#This function generates an SQL-formatted string of random 
+#This function generates an SQL-formatted string of random
 # buy/sell orders, which is used to populate the order table
 def generate_orders(number_of_entries, number_of_users, coins):
 
@@ -161,13 +176,12 @@ def generate_orders(number_of_entries, number_of_users, coins):
         amount1 = randint(1, 100)
         amount2 = randint(1, 100)
 
-
         if i == 0:
-            order_strings += "(" + str(user_id) + ", '" + coin1 + "', '" + coin2 + "', '" + order_type + "', " + str(amount1) + ", " + str(amount2) + ")"
+            order_strings += "(" + str(user_id) + ", '" + order_type + "', '" + coin1 + "', '" + str(amount1) + "', '" + str(amount2) +  "', NOW()" ")"
 
         else:
-            order_strings += ",\n(" + str(user_id) + ", '" + coin1 + "', '" + coin2 + "', '" + order_type + "', " + str(amount1) + ", " + str(amount2) + ")"
-
+            order_strings += ",\n(" + str(user_id) + ", '" + order_type + "', '" + coin1 + "', '" + str(amount1) + "', '" + str(amount2) +  "', NOW()" ")"
+    
     return order_strings
 
 

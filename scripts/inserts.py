@@ -1,6 +1,8 @@
 import psycopg2
 import sys
 
+coins = ['BTC', 'ETH', 'XRP', 'BCH', 'LTC', 'EOS', 'ADA', 'XLM', 'NEO', 'XMR']
+
 def submit_question(question_info):
 
     #Extract parameters from request object
@@ -109,7 +111,19 @@ def insert_into_users(forms):
     email = forms['email']
 
 
-    cur.execute("INSERT INTO users (username, password, email) VALUES(%s, %s, %s);" ,(username, password ,email))
+    cur.execute("INSERT INTO users (username, password, email) VALUES(%s, %s, %s);", (username, password, email))
+    cur.execute("SELECT user_id FROM users WHERE username = '" + username + "'")
+    user_id = cur.fetchall()[0][0]
+
+
+    #Create balances for each coin for the new user
+    insert_balances = []
+
+    for coin in coins:
+        insert_balances.append("INSERT INTO balances VALUES (" + str(user_id) + ", '" + coin + "', 100)")
+
+    for insert_balance in insert_balances:
+        cur.execute(insert_balance)
 
     #Destroy connection
     cur.close()
@@ -345,3 +359,277 @@ def update_question_vote(question_info):
     conn.close()
 
     return "true"
+
+
+def submit_order(order_info):
+
+    ###################
+    #Extract parameters
+    ###################
+    username = order_info['username']
+    order_type = order_info['order_type']
+    coin_type = order_info['coin_type']
+    order_amount = order_info['order_amount']
+    order_price = order_info['order_price']
+
+
+    ##################
+    #Set up connection
+    ##################
+    conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
+    conn = psycopg2.connect(conn_string)
+    cur = conn.cursor()
+
+
+    ##########################
+    #Get user_id from username
+    ##########################
+    get_user_id = "SELECT user_id FROM users WHERE username = '" + username + "'"
+    cur.execute(get_user_id)
+    user_id = cur.fetchall()[0][0]
+
+
+    ##############################################################
+    #Check the user's balance to ensure they have sufficient funds
+    ##############################################################
+    if order_type == "Buy":
+        get_user_balance = "SELECT coin_balance FROM balances WHERE user_id = '" + str(user_id) + "' AND coin_id = 'BTC'"
+
+    elif order_type == "Sell":
+        get_user_balance = "SELECT coin_balance FROM balances WHERE user_id = '" + str(user_id) + "' AND coin_id = '" + coin_type + "'"
+
+    cur.execute(get_user_balance)
+    balance = cur.fetchall()[0][0]
+  
+
+    ################################
+    #The user has insufficient funds
+    ################################
+    if balance < float(order_amount) / float(order_price):
+
+        cur.close()
+        conn.commit()
+        conn.close()
+        return "insufficient funds"
+
+
+
+    ###########################################
+    #Sufficient funds; proceed with transaction
+    ###########################################
+    else:
+
+        #############################################################
+        #Update user's balance by subtracting whatever they're paying
+        #############################################################
+        if order_type == "Buy":
+            update_balance(cur, user_id, "BTC", -1 * (float(order_amount) / float(order_price)))
+
+        elif order_type == "Sell":
+            update_balance(cur, user_id, coin_type, -1 * float(order_amount))
+
+
+        #########################################################
+        #Find all orders in open_orders matching the user's order 
+        #########################################################
+        opposite_order_type = "Sell" if order_type == "Buy" else "Buy"
+
+        cur.execute(""" SELECT order_id, user_id, amount 
+                        FROM open_orders 
+                        WHERE coin_id = '""" + coin_type + """' AND
+                              price = '""" + str(order_price) + """' AND
+                              order_type  = '""" + opposite_order_type + """' 
+                        ORDER BY ts ASC """)
+
+        result_set = cur.fetchall()
+
+
+        ###################################
+        #Store results in a coherent format
+        ###################################
+        matching_orders = []
+        for matching_order in result_set:
+            matching_orders.append({
+                'order_id': matching_order[0],
+                'user_id': matching_order[1],
+                'amount': matching_order[2]
+            })
+
+
+        if len(matching_orders) == 0:
+
+            ########################################################################
+            #There are no matching orders; insert into entire order into open_orders
+            ########################################################################
+            cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts) 
+                            VALUES ('""" + str(user_id) + "', '" + order_type + "', '" + coin_type + "', " + str(order_amount) + ", " + str(order_price) + ", NOW())")
+
+
+        else:
+
+            ######################################################################
+            #Iterate through matching orders, matching as many of them as possible
+            ######################################################################
+            amount_remaining = order_amount
+
+            for matching_order in matching_orders:
+
+                if amount_remaining > matching_order['amount']:
+                    
+                    #Remove the matching order from open_orders
+                    delete_open_order(cur, matching_order['order_id'])
+
+                    #Create a successful order for the current matching_order
+                    create_successful_order(cur, matching_order['user_id'], user_id, opposite_order_type, coin_type, matching_order['amount'], order_price)
+
+                    #Update both users' balances
+                    if order_type == "Buy":
+
+                        #Update fulfiller's balance
+                        update_balance(cur, user_id, coin_type, matching_order['amount'])
+
+                        #Update maker's balance
+                        update_balance(cur, matching_order['user_id'], "BTC", matching_order['amount'] / order_price)
+
+                    elif order_type == "Sell":
+
+                        #Update fulfiller's balance
+                        update_balance(cur, user_id, "BTC", matching_order['amount'] / order_price)
+
+                        #Update maker's balance
+                        update_balance(cur, matching_order['user_id'], coin_type, matching_order['amount'])
+                    
+                    #Update amount_remaining
+                    account_remaining -= matching_order['amount']
+
+
+
+                elif amount_remaining < matching_order['amount']:
+
+                    #Update matching order with new amount
+                    update_open_order(cur, matching_order['order_id'], matching_order['amount'] - amount_remaining)
+
+                    #Create a successful order for the transaction
+                    create_successful_order(cur, matching_order['user_id'], user_id, opposite_order_type, coin_type, amount_remaining, order_price)
+         
+                    #Update both users' balances
+                    if order_type == "Buy":
+
+                        #Update fulfiller's balance
+                        update_balance(cur, user_id, coin_type, amount_remaining)
+
+                        #Update maker's balance
+                        update_balance(cur, matching_order['user_id'], "BTC", amount_remaining / order_price)
+
+                    elif order_type == "Sell":
+
+                        #Update fulfiller's balance
+                        update_balance(cur, user_id, "BTC", amount_remaining / order_price)
+
+                        #Update maker's balance
+                        update_balance(cur, matching_order['user_id'], coin_type, amount_remaining)
+
+                    #amount_remaining should become zero
+                    amount_remaining = 0
+                    break
+
+
+                elif amount_remaining == matching_order['amount']:
+
+                    #Remove matching order from open_orders
+                    delete_open_order(cur, matching_order['order_id'])
+
+                    #Create a successful order for the transaction
+                    create_successful_order(cur, matching_order['user_id'], user_id, opposite_order_type, coin_type, amount_remaining, order_price)
+
+                    #Update both users' balances
+                    if order_type == "Buy":
+
+                        #Update fulfiller's balance
+                        update_balance(cur, user_id, coin_type, amount_remaining)
+
+                        #Update maker's balance
+                        update_balance(cur, matching_order['user_id'], "BTC", amount_remaining / order_price)
+
+
+                    elif order_type == "Sell":
+
+                        #Update fulfiller's balance
+                        update_balance(cur, user_id, "BTC", amount_remaining / order_price)
+
+                        #Update maker's balance
+                        update_balance(cur, matching_order['user_id'], coin_type, amount_remaining)
+
+                    #amount_remaining should become zero
+                    amount_remaining -= matching_order['amount']
+                    break
+
+
+            ################
+            #End of for loop
+            ################
+
+
+            ####################################################################################
+            #If there's still something left in amount_remaining, create a new row in open_order
+            #################################################################################### 
+            if amount_remaining != 0:
+
+                cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts) 
+                                VALUES ('""" + str(user_id) + "', '" + order_type + "', '" + coin_type + "', " + str(amount_remaining) + ", " + str(order_price) + ", NOW())")
+
+                cur.close()
+                conn.commit()
+                conn.close()
+                return "order added"
+
+
+            ################################
+            #Order was completely matched up
+            ################################
+            elif amount_remaining == 0:
+
+                cur.close()
+                conn.commit()
+                conn.close()
+                return "order completed"
+
+
+    #Destroy connection
+    cur.close()
+    conn.commit()
+    conn.close()
+    return 'true'
+
+
+
+def update_balance(cur, user_id, coin_id, balance_increment):
+
+    cur.execute(""" UPDATE balances 
+                    SET coin_balance = coin_balance + """ + str(balance_increment) + """ 
+                    WHERE user_id = '""" + str(user_id) + """' AND 
+                          coin_id = '""" + coin_id + "'")
+
+
+
+#Remove a row from the open_orders table
+def delete_open_order(cur, order_id):
+
+    cur.execute("DELETE FROM open_orders WHERE order_id = '" + str(order_id) + "'")
+
+
+
+#Add a row to the successful_orders table
+def create_successful_order(cur, maker_id, fulfiller_id, order_type, coin_id, amount, price):
+
+    cur.execute(""" INSERT INTO successful_orders (maker_user_id, fulfiller_user_id, order_type , coin_id, amount, price, ts) 
+        VALUES ('""" + str(maker_id) + "', '" + str(fulfiller_id) + "','" + order_type + "','""" 
+                     + coin_id + "','" + str(amount) + "','" + str(price) + "')")
+
+
+
+def update_open_order(cur, order_id, new_amount):
+
+    cur.execute(""" UPDATE open_orders 
+                    SET amount = """ + str(new_amount) + """
+                    WHERE order_id = """ + str(order_id))

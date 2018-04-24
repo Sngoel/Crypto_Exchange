@@ -2,13 +2,14 @@
 
 
 //Globals and configuration variables
+var current_coin = "XRP";
+
+
 var tableTimer;
 var username;
 var order_data = [];
 
 
-var columns = 3;
-var rows = 16;
 
 
 var currentIndex = 0;
@@ -25,9 +26,9 @@ $(document).ready(function(){
 	
 
 	//Get order data for table from server
-	get("/get_orders", function(response){
+	post("/get_orders", {coin_type: current_coin}, function(response){
 
-		order_data = response;
+		console.log(response);
 
 
 		/***********************************************
@@ -37,60 +38,34 @@ $(document).ready(function(){
 		************************************************/
 		
 
-		/*var table_html = '';
+		var table_html = '';
 
 		table_html += ` <thead>
 							<tr>
-								<th>Column 1</th>
-								<th>Column 2</th>
-								<th>Column 3</th>
+								<th scope = "col">#</th>
+								<th scope = "col">` + current_coin + `</th>
+								<th scope = "col">` + current_coin + `/BTC</th>
 							</tr>
 						</thead>
 						<tbody>`
 
-		for(let i = 0; i < rows; i++){
+		for(let i = 0; i < response.length; i++){
 
-			table_html += '<tr>';
-			for(let j = 0; j < columns; j++){
-				table_html += '<td>' +  +'</td>';
-			}
-		}*/
+			table_html +=  `<tr>
+						   		<th scope = "row">` + (i + 1) + `</th>
+								<td>` + response[i].order_amount + `</td>
+								<td>` + response[i].order_price + `</td>
+							</tr>`;
 
-
-
-		//Create HTML table
-		for(let i = 0; i < rows; i++){
-			var rowNode = document.createElement("TR");
-			for(let j = 0; j < columns; j++){
-				var dataCellNode = document.createElement("TD");
-
-				var column_mapping = [4, 2, 5];
-
-				var text = order_data[i][column_mapping[j]];
-
-				var text;
-				if(j == 0){
-					text = order_data[i][4];
-				}
-
-				else if(j == 1){
-					text = order_data[i][2];
-				}
-
-				else if(j == 2){
-					text = order_data[i][5];
-				}
-
-				var textNode = document.createTextNode(order_data[i][column_mapping[j]]);
-				dataCellNode.appendChild(textNode);
-				rowNode.appendChild(dataCellNode);
-			}
-			document.getElementById("order_table").appendChild(rowNode);
 		}
-		
 
-		//Call updateTable() every secondsBetweenUpdates seconds
-		tableTimer = window.setInterval(updateTable, secondsBetweenUpdates * 1000);
+
+
+		table_html += "</tbody>";
+
+		//console.log(table_html);
+
+		document.getElementById("order_table").innerHTML = table_html;
 	});
 
 
@@ -106,62 +81,51 @@ $(document).ready(function(){
 }); 	//end of document.ready
 	
 
-//This is the function that's called every x seconds to update the table
-var updateTable = function(){
-	var currentRow = $("tr").first();
-	for(let i = 1; i < rows; i++){
 
-		var currentCell = currentRow.children().first();
 
-		currentCell.text(order_data[currentIndex + i][4]);
-		currentCell = currentCell.next();
-		currentCell.text(order_data[currentIndex + i][2]);
-		currentCell = currentCell.next();
-		currentCell.text(order_data[currentIndex + i][5]);
+var submit_order = function(){
 
-		currentRow = currentRow.next();
+	var coin_type = document.getElementById("coin_type").value;
+	var order_amount = document.getElementById("order_amount").value;
+	var order_price = document.getElementById("order_price").value;
+	var order_type = document.getElementById("order_type").value;
+
+	if(coin_type === "Empty"){
+		alert("Please select a coin type");
 	}
-	currentIndex += shiftBy;
+	
+	else if(order_amount === "" || isNaN(order_amount) || parseInt(order_amount) <= 0){
+		alert("Please enter a valid order amount");
+	}
+
+	else if(order_price === "" || isNaN(order_price)|| parseInt(order_price) <= 0){
+		alert("Please enter a valid order amount");
+	}
+
+	else{
+
+	    var order_info = {
+	    	username: sessionStorage.getItem("username"),
+			order_amount : order_amount,
+			order_price : order_price,
+			order_type : order_type,
+			coin_type: coin_type
+	    };
+
+	    post('/submit_order', order_info, function(response){
+
+	    	if(response === "insufficient funds"){
+	    		alert("You have insufficient funds for this transaction; transaction was canceled");
+	    	}
+
+	    	else if(response === "order added"){
+	    		alert("Your order was added to the database");
+	    	}
+
+	    	else if(response === "order completed"){
+	    		alert("Your order was successfully completed");
+	    	}
+	    });
+	}
 }
 
-
-var pauseData = function(){
-	clearInterval(tableTimer);
-}
-
-
-var place_order = function(order_type){
-
-    var order_info = {
-		amount : document.getElementById('amount').value,
-		price : document.getElementById('price').value,
-		order_type : order_type
-    };
-
-    post('/submit_order', order_info, function(response){
-    	console.log(response)
-    });
-}
-
-
-
-
-
-
-
-/*
-//Generate data
-var coins = ["BTC", "ETH", "LTC", "XRP", "NEO"];
-var orderLimit = 1000;
-var orders = [];
-for(let i = 0; i < orderLimit; i++){
-	var coinIndex = Math.floor(Math.random() * coins.length);
-	orders.push({
-		coin1: coins[coinIndex],
-		amount1: Math.floor(Math.random() * 100),
-		coin2: coins[coins.length - 1 - coinIndex],
-		amount2: Math.floor(Math.random() * 100)
-	});
-	//console.log(orders[orders.length - 1]);
-}
-*/

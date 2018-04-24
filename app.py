@@ -42,7 +42,9 @@ def search_results():
 	return render_template('search_results.html')
 
 
-
+@app.route('/account', methods=['GET','POST'])
+def account():
+	return render_template('account.html')
 
 
 
@@ -65,9 +67,9 @@ def load_thread():
 	return jsonify(selects.load_thread(request.get_json()))
 
 
-@app.route('/get_orders', methods = ['GET'])
+@app.route('/get_orders', methods = ['POST'])
 def get_orders():
-	return jsonify(selects.find_orders())
+	return jsonify(selects.find_orders(request.get_json()))
 
 
 @app.route("/submit_question", methods = ['POST'])
@@ -85,13 +87,6 @@ def delete_question():
 @app.route("/delete_comment", methods = ['POST'])
 def delete_comment():
 	return inserts.delete_comment(request.get_json())
-
-
-#### NEED TO CHECK AND MAKE SURE THIS WAS ACTUALLY SUCCESSFUL ###
-@app.route('/submit_order', methods = ['POST'])
-def submit_order():
-    inserts.insert_into_orders(request.get_json())
-    return 'True'
 
 
 @app.route('/registration', methods = ['POST'])
@@ -128,6 +123,26 @@ def update_question_vote():
 @app.route('/insert_question_vote', methods = ['POST'])
 def insert_question_vote():
 	return inserts.insert_question_vote(request.get_json())
+
+
+@app.route('/submit_order', methods = ['POST'])
+def submit_order():
+	return inserts.submit_order(request.get_json())
+
+
+@app.route('/get_balances', methods=['GET','POST'])
+def get_balances():
+	balances = selects.get_balances(request.get_json())
+	print(balances)
+	return jsonify(balances)
+
+
+@app.route('/get_transaction_history', methods=['GET','POST'])
+def get_transaction_history():
+	history = selects.get_history(request.get_json())
+	for transaction in history:
+		print(transaction)
+	return jsonify(history)
 
 
 

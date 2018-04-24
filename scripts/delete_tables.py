@@ -17,11 +17,15 @@ def delete_tables():
         "DROP TABLE comments CASCADE",
         "DROP TABLE questions CASCADE",
         "DROP TABLE open_orders CASCADE",
+        "DROP TABLE successful_orders CASCADE",
+        "DROP TABLE balances CASCADE",
         "DROP TABLE categories CASCADE",
         "DROP TABLE question_votes CASCADE",
         "DROP TABLE comment_votes CASCADE",
         "DROP TABLE coins CASCADE"
     )
+
+
 
     for command in commands:
         cur.execute(command)
