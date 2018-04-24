@@ -73,6 +73,7 @@ var validate = function(){
 		post("/registration", registration_info, function(response){
 			if(response === "False"){
 				alert("Username already in use");
+				return;
 			}
 			else{
 				sessionStorage.setItem("username", username);
