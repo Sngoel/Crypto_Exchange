@@ -11,7 +11,7 @@
 
 	<!-- Our JS -->
 	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
-	<script src = "{{url_for('static', filename='forum.js')}}"></script>
+	<script src = "{{url_for('static', filename='search_results.js')}}"></script>
 
 	<style>
 		table {border: 0.1em solid black;}
@@ -24,13 +24,6 @@
 			margin: 0% 5% 0% 5%;
 			border: 1px solid black;
 		}
-		.list-group-item:nth-child(odd) {
-			background: #f2f2f2;
-		}
-		.list-group-item:nth-child(even) {
-			background: #e6e6e6;
-		}
-
 	</style>
 </head>
 <body>
@@ -55,20 +48,7 @@
 		</div>
 	</nav>
 
-
-	<div class="container panel panel-default" id = "submit_question_container" style = "width: 80%; margin: 0% 0% 3% 10%; padding-bottom: 1%; background-color: WhiteSmoke; display: none;">
 	
-		<div class="page-header">
-			<h1>Ask a Question</h1>
-		</div>
-		<input type="text" class="form-control " id = "question_summary" placeholder="Question summary">
-		<br>
-		<textarea class="form-control" rows="4" id="question_description" placeholder="Question description"></textarea>
-		<br>
-		<button type="button" class="btn btn-default" style = "float: right;" onclick = "submit_question()">Submit</button>
-
-	</div>
-
 
 	<!--<iframe width="350" height="430" src="https://console.dialogflow.com/api-client/demo/embedded/63005870-00f4-4f32-89df-9ebdf320a73b"></iframe>-->
 

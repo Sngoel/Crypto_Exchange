@@ -1,131 +1,85 @@
 <html>
 <head>
 	<title>0x431 Forum</title>
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Our JS -->
+	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
+	<script src = "{{url_for('static', filename='thread.js')}}"></script>
+
 	<style>
 		table {border: 0.1em solid black;}
 		tr {border: 0.1em solid black;}
 		td {border: 0.1em solid black; padding: 0.2em;}
-		.comment_container {
-			width: 100%;
-			height: 10%;
-			border: 1px solid black;
-			box-sizing: border-box;
-			margin: 2% 0 0 0;
-		}
-		.vote_container {
-			width: 15%;
-			height: 100%;
-			border: 1px solid blue;
+		.comment_text_container {
+			width: 85%;
 			display: inline-block;
+			font-size: 150%;
 		}
 		.vote_count_container {
 			width: 40%;
-			height: 100%;
 			display: inline-block;
 			font-size: 250%;
+			vertical-align: middle;
 		}
-		.vote_buttons_container {
-			width: 40%;
-			height: 100%;
+		#question_text_container {
+			width: 85%;
 			display: inline-block;
+			vertical-align: middle;
 		}
-		.vote_button {
-			width: 90%;
-			height: 50%;
-		}
-		.comment_text_container {
-			width: 84%;
-			height: 100%;
-			border: 1px solid red;
-			display: inline-block;
-			vertical-align: top;
-		}
-		#search_bar {
-			width: 30%;
-			height: 90%;
-			float: right;
-			margin: 0.2% 3%;
-			padding: 0% 1% 0% 0%;
-			font-size: 1.5em;
-			text-align: right;
-			color: grey;
-		}
-		#header_bar_container{
-			width: 100%;
-			height: 8%;
-			background-color: orange;
-			border: 1px solid black;
-			box-sizing: border-box;
-		}
-	</style>
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
-	<script src = "{{url_for('static', filename='thread.js')}}"></script>
 
+	</style>
 </head>
 <body>
-	<!-- ORANGE HEADER BAR -->
-	<div id = "header_bar_container">
-		<div style = "color: black; font-size: 250%; display: inline-block;">&nbsp;0x431 Cryptocurrency Exchange</div>
-		<div style = "color: black; font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/">Log Out</a></div>
-		<div style = "display: inline-block; float: right; background-color: black; width: 0.2%; height: 100%;"></div>
-		<div style = "font-size: 2em; margin: 0.2em; display: inline-block; float: right;"><a style = "text-decoration: none; color: black;" href = "/dashboard">Dashboard</a></div>
-		<input id = "search_bar" type = "text" value = "Search" onclick = "clicked_search_bar()">
-	</div>
-	<br>
-
-		
-
-	<div id = "question_container" style = "border: 1px solid black;">
-		<div id = "rating_and_summary_container" style = "height: 10%;">
-
-			<!-- Total vote number and upvote/downvote buttons  -->
-			<div id = "rating_container" style = "display: inline-block; width: 15%; height: 100%;">
-				<div style = "display: inline-block; height: 100%; width: 40%; font-size: 250%;">166&nbsp;</div>
-				<div style = "display: inline-block; height: 100%; width: 40%">
-					<input type = "button" style = "width: 90%; height: 50%;" value = "Upvote">
-					<input type = "button" style = "width: 90%; height: 50%;" value = "Downvote">
-				</div>
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><strong>0x431 Cryptocurrency Exchange</strong></a>
 			</div>
+			<ul class="nav navbar-nav">
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li><a href="/forum">Forum</a></li>
+			</ul>
+			<div class="form-group navbar-form navbar-left">
+				<input type="text" class="form-control " id = "search_bar" placeholder="Search">
+				<button type="button" class="btn btn-default" onclick = "search()">Submit</button>
+			</div>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#"><span class="glyphicon glyphicon-user"></span> Account</a></li>
+				<li onclick = "log_out()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+			</ul>
+		</div>
+	</nav>
 
-			<!-- Question summary -->
-			<div id = "question_summary" style = "width: 85%; height: 100%; background-color: tan; border: 0.2em solid brown; box-sizing: border-box; font-size: 2em; display: inline-block; float: right; padding-left: 0.75%;">
-				<b>This is a sample question.</b>
+	<div id = "question"></div>
+
+	<div id = "comments"></div>
+
+
+	<!--<div class = "well well-sm" style = "width: 90%; margin-left: 5%;">
+		<input type="text" style = "display: inline-block; width: 93%;" class="form-control " id = "new_comment" placeholder="Comment">
+		<button type="button" class="btn btn-default" style = "display: inline-block; float: right;" onclick = "submit_question()">Submit</button>
+	</div>-->
+
+	<!-- Question div -->
+	<!--<div class="well well-sm">
+		<div style = "width: 15%; display: inline-block">
+			<div class = "vote_count_container">13</div>
+			<div class="btn-group-vertical" style = "display: inline-block">
+				<button type="button" class="btn btn-success">Upvote</button>
+				<button type="button" class="btn btn-danger">Downvote</button>
 			</div>
 		</div>
-
-		<!-- We need this container; whatever you do, don't remove it -->
-		<div id = "question_description_container" style = "min-height: 9%;">
-
-			<!-- Question description -->
-			<div style = "width: 85%; margin: 0% 0% 0% 0%; float: right; background-color: tan; border: 1px solid black; box-sizing: border-box; font-size: 1em; padding: 0.5em;">
-				Users can anonymously post whatever questions they want, like "How do I trade Bitcoin for Litecoin?", or "Why do these HTML pages look so bad?". Other users will be able to comment on any question to give a response. We also plan on making it so that users can upvote or downvote both questions and comments.
-			</div>
+		<div id = "question_text_container">
+			<div style = "font-size: 200%;">asdfasdf</div>
+			<div style = "font-size: 100%;">asdfasdf</div>
 		</div>
-	</div>
-
-
-
-
-	<!-- This div should wrap an entire comment, including the rating panel and the text description -->
-	<div class = "comment_container" style = "display: none; width: 100%; height: 10%; border: 1px solid black; box-sizing: border-box; margin: 2% 0 0 0;">
-
-		<!-- Total vote number and upvote/downvote buttons  -->
-		<div style = "width: 15%; height: 100%; border: 1px solid blue; display: inline-block;">
-			<div style = "width: 40%; height: 100%; display: inline-block; font-size: 250%;">166&nbsp;</div>
-			<div style = "width: 40%; height: 100%; display: inline-block;">
-				<input type = "button" style = "width: 90%; height: 50%;" value = "Upvote">
-				<input type = "button" style = "width: 90%; height: 50%;" value = "Downvote">
-			</div>
-		</div>
-
-		<!-- Comment text -->
-		<div style = "width: 84%; height: 100%; border: 1px solid red; display: inline-block; vertical-align: top;">This is random garbage text. It doesn't have any value or purpose; it exists solely as a placeholder.</div>
-	</div>
-
-	
-		
+	</div>-->
 
 </body>
 </html>

@@ -22,11 +22,6 @@ def index():
 	return render_template('landing.html')
 
 
-@app.route('/login')
-def login():
-	return render_template('login.html')
-
-
 @app.route('/dashboard')
 def dashboard():
 	return render_template('dashboard.html')
@@ -42,6 +37,11 @@ def thread():
 	return render_template('thread.html')
 
 
+@app.route('/search_results')
+def search_results():
+	return render_template('search_results.html')
+
+
 
 
 
@@ -49,6 +49,11 @@ def thread():
 ##########################################
 ###      POST/GET REQUEST HANDLERS     ###
 ##########################################
+
+
+@app.route('/search', methods = ['POST'])
+def search():
+	return jsonify(selects.search(request.get_json()))
 
 @app.route('/get_questions', methods = ['POST'])
 def get_questions():
@@ -65,12 +70,36 @@ def get_orders():
 	return jsonify(selects.find_orders())
 
 
+@app.route("/submit_question", methods = ['POST'])
+def submit_question():
+	return jsonify(inserts.submit_question(request.get_json()))
+
+@app.route("/submit_comment", methods = ['POST'])
+def submit_comment():
+	return jsonify(inserts.submit_comment(request.get_json()))
+
+@app.route("/delete_question", methods = ['POST'])
+def delete_question():
+	return inserts.delete_question(request.get_json())
+
+@app.route("/delete_comment", methods = ['POST'])
+def delete_comment():
+	return inserts.delete_comment(request.get_json())
+
 
 #### NEED TO CHECK AND MAKE SURE THIS WAS ACTUALLY SUCCESSFUL ###
 @app.route('/submit_order', methods = ['POST'])
 def submit_order():
     inserts.insert_into_orders(request.get_json())
     return 'True'
+
+
+@app.route('/registration', methods = ['POST'])
+def registration():
+	if inserts.insert_into_users(request.get_json()):
+		return url_for("dashboard")
+	else:
+		return "false"
 
 
 @app.route('/validate_login', methods = ['POST'])
@@ -81,39 +110,24 @@ def validate_login():
 		return "false"
 
 
+@app.route('/update_comment_vote', methods = ['POST'])
+def update_comment_vote():
+	return inserts.update_comment_vote(request.get_json())
 
-class RegisterForm(Form):
-	name = StringField('Name', [validators.Length(min=4, max=50)])
-	username = StringField('Username', [validators.Length(min=4, max=25)])
-	email = StringField('Email', [validators.Length(min=8, max=60)])
-	password = StringField('Password', [validators.DataRequired(),
-		validators.EqualTo('confirm', message= 'Passwords do not match')
-		])
-	confirm = PasswordField('Confirm Password')
 
-@app.route('/register', methods= ['GET','POST'])
-def register():
-	form = RegisterForm(request.form)
-	if request.method == 'POST' and form.validate():
-		name = form.name.data
-		email = form.email.data
-		username = form.username.data
-		password = str(form.password.data)#sha256_crypt.encrypt(str(form.password.data))
+@app.route('/insert_comment_vote', methods = ['POST'])
+def insert_comment_vote():
+	return inserts.insert_comment_vote(request.get_json())
 
-		#Place DB Writing Stuff Here
-		###
-		###
-		###
-		#############################
-		print(name,email,username,password)
-		input_form = [name , email , username , str(form.password.data)]
-		print("Test")
-		print(input_form)
-		flash('You are now registered with 0x431 Exchange')
-		inserts.insert_into_users(input_form)
-		return render_template('register.html', form= form)
 
-	return render_template('register.html', form= form)
+@app.route('/update_question_vote', methods = ['POST'])
+def update_question_vote():
+	return inserts.update_question_vote(request.get_json())
+
+
+@app.route('/insert_question_vote', methods = ['POST'])
+def insert_question_vote():
+	return inserts.insert_question_vote(request.get_json())
 
 
 
