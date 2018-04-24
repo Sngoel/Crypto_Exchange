@@ -111,6 +111,20 @@ def insert_into_users(forms):
     email = forms['email']
 
 
+    cur.execute(""" SELECT username, email 
+                    FROM users 
+                    WHERE username = '""" + username + """' OR 
+                          email = '""" + email + "'")
+
+
+    if len(cur.fetchall()) != 0:
+
+        cur.close()
+        conn.commit()
+        conn.close()
+        return False
+
+
     cur.execute("INSERT INTO users (username, password, email) VALUES(%s, %s, %s);", (username, password, email))
     cur.execute("SELECT user_id FROM users WHERE username = '" + username + "'")
     user_id = cur.fetchall()[0][0]

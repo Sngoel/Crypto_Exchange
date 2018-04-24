@@ -52,7 +52,7 @@ $(document).ready(function(){
 		//Render all HTML related to the comments under the current question
 		for(let i = 0; i < page_info.comments.length; i++){
 			var comment_html = '';
-			comment_html += '<div class="well well-sm"  style = "width: 90%; margin-left: 5%;" id = "' + response.comments[i].comment_id + '">';
+			comment_html += '<div class="well well-sm"  style = "width: 85%; margin-left: 10%;" id = "' + response.comments[i].comment_id + '">';
 			comment_html += 	'<div style = "width: 15%; display: inline-block;">';
 			comment_html += 		'<div class = "vote_count_container">' + response.comments[i].vote_count + '</div>';
 			comment_html += 		'<div class="btn-group-vertical" style = "display: inline-block;">';
@@ -96,7 +96,7 @@ var submit_comment = function(){
 		});
 
 		var comment_html = '';
-		comment_html += '<div class="well well-sm"  style = "width: 90%; margin-left: 5%;" id = "' + response + '">';
+		comment_html += '<div class="well well-sm"  style = "width: 85%; margin-left: 10%;" id = "' + response + '">';
 		comment_html += 	'<div style = "width: 15%; display: inline-block;">';
 		comment_html += 		'<div class = "vote_count_container">0</div>';
 		comment_html += 		'<div class="btn-group-vertical" style = "display: inline-block;">';
