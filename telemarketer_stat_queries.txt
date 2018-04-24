@@ -1,0 +1,15 @@
+#Average Coin value for market
+SELECT S.coin_id, avg(S.price)
+FROM S.successful_orders
+
+#Average per coin balance in users wallets
+SELECTVB.coin_id, avg(B.price)
+FROM B balances
+
+//Percentage of completed orders
+SELECT (((count(S.*)/(count(O.*)+count(S.*))) *100) AS perc
+FROM S.successful_orders, O.open_orders
+
+//Bid order match rate
+SELECT (((count(S.*)/(count(O.*)+count(S.*))) *100) AS perc
+FROM S.successful_orders, O.open_orders
