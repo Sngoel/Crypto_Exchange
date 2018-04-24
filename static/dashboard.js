@@ -6,7 +6,6 @@ var current_coin = "XRP";
 
 
 var tableTimer;
-var username;
 var order_data = [];
 
 
@@ -21,9 +20,25 @@ $(document).ready(function(){
 	//If user is not currently logged in, redirect to landing page
 	check_if_logged_in();
 
-	username = sessionStorage.getItem("username");
-	//console.log(username);
+	//Load data into tables
+	refresh_tables();
+
+
+	//Sample graph to build off of
+	TESTER = document.getElementById('graph');
+	Plotly.plot(TESTER, [{
+		x: [1, 2, 3, 4, 5],
+		y: [1, 2, 4, 8, 16]
+	}], {
+		margin: {
+		t: 0
+	}});
+}); 	//end of document.ready
 	
+
+
+
+var refresh_tables = function(){
 
 	//Get order data for table from server
 	post("/get_orders", {coin_type: current_coin}, function(response){
@@ -84,20 +99,7 @@ $(document).ready(function(){
 		table_html += "</tbody>";
 		document.getElementById("sell_order_table").innerHTML = table_html;
 	});
-
-
-	//Sample graph to build off of
-	TESTER = document.getElementById('graph');
-	Plotly.plot(TESTER, [{
-		x: [1, 2, 3, 4, 5],
-		y: [1, 2, 4, 8, 16]
-	}], {
-		margin: {
-		t: 0
-	}});
-}); 	//end of document.ready
-	
-
+}
 
 
 var submit_order = function(){
@@ -136,10 +138,12 @@ var submit_order = function(){
 	    	}
 
 	    	else if(response === "order added"){
+	    		refresh_tables();
 	    		alert("Your order was added to the database");
 	    	}
 
 	    	else if(response === "order completed"){
+	    		refresh_tables();
 	    		alert("Your order was successfully completed");
 	    	}
 	    });

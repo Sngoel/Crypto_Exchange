@@ -369,8 +369,8 @@ def submit_order(order_info):
     username = order_info['username']
     order_type = order_info['order_type']
     coin_type = order_info['coin_type']
-    order_amount = order_info['order_amount']
-    order_price = order_info['order_price']
+    order_amount = float(order_info['order_amount'])
+    order_price = float(order_info['order_price'])
 
 
     ##################
@@ -452,7 +452,7 @@ def submit_order(order_info):
             matching_orders.append({
                 'order_id': matching_order[0],
                 'user_id': matching_order[1],
-                'amount': matching_order[2]
+                'amount': float(matching_order[2])
             })
 
 
@@ -500,7 +500,7 @@ def submit_order(order_info):
                         update_balance(cur, matching_order['user_id'], coin_type, matching_order['amount'])
                     
                     #Update amount_remaining
-                    account_remaining -= matching_order['amount']
+                    amount_remaining -= matching_order['amount']
 
 
 
@@ -624,7 +624,7 @@ def create_successful_order(cur, maker_id, fulfiller_id, order_type, coin_id, am
 
     cur.execute(""" INSERT INTO successful_orders (maker_user_id, fulfiller_user_id, order_type , coin_id, amount, price, ts) 
         VALUES ('""" + str(maker_id) + "', '" + str(fulfiller_id) + "','" + order_type + "','""" 
-                     + coin_id + "','" + str(amount) + "','" + str(price) + "')")
+                     + coin_id + "','" + str(amount) + "','" + str(price) + "', NOW())")
 
 
 
