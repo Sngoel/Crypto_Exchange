@@ -463,6 +463,10 @@ def submit_order(order_info):
             ########################################################################
             cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts) 
                             VALUES ('""" + str(user_id) + "', '" + order_type + "', '" + coin_type + "', " + str(order_amount) + ", " + str(order_price) + ", NOW())")
+            cur.close()
+            conn.commit()
+            conn.close()
+            return "order added"
 
 
         else:

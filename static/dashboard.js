@@ -2,7 +2,7 @@
 
 
 //Globals and configuration variables
-var current_coin = "XRP";
+var current_coin = "ETH";
 
 
 var tableTimer;
@@ -36,7 +36,20 @@ $(document).ready(function(){
 }); 	//end of document.ready
 	
 
+var select_coin = function(event){
 
+	//Reset class of previously selected coin button
+	document.getElementById(current_coin).className = "btn btn-primary";
+
+	//Change class of selected button to indicate selected coin
+	event.target.className = "btn btn-danger";
+
+	//Set current coin
+	current_coin = event.target.id;
+
+	//Refresh table with new coin
+	refresh_tables();
+}
 
 var refresh_tables = function(){
 
@@ -132,6 +145,8 @@ var submit_order = function(){
 	    };
 
 	    post('/submit_order', order_info, function(response){
+
+	    	console.log(response);
 
 	    	if(response === "insufficient funds"){
 	    		alert("You have insufficient funds for this transaction; transaction was canceled");

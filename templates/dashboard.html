@@ -39,7 +39,7 @@
 </head>
 <body>
 
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-inverse" style = "margin-bottom: 0%;">
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#"><strong>0x431 Cryptocurrency Exchange</strong></a>
@@ -56,6 +56,31 @@
 				<li><a href="/account"><span class="glyphicon glyphicon-user"></span> Account</a></li>
 				<li onclick = "log_out()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 			</ul>
+		</div>
+	</nav>
+
+	<nav class="navbar navbar-inverse" style = "margin-top: 0%;">
+		<div class="container-fluid">
+			<div class="form-group navbar-form navbar-left">
+
+				<button type="button" id = "ETH" class="btn btn-danger" onclick = "select_coin(event)">ETH</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "XRP" class="btn btn-primary" onclick = "select_coin(event)">XRP</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "BCH" class="btn btn-primary" onclick = "select_coin(event)">BCH</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "LTC" class="btn btn-primary" onclick = "select_coin(event)">LTC</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "EOS" class="btn btn-primary" onclick = "select_coin(event)">EOS</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "ADA" class="btn btn-primary" onclick = "select_coin(event)">ADA</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "XLM" class="btn btn-primary" onclick = "select_coin(event)">XLM</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "NEO" class="btn btn-primary" onclick = "select_coin(event)">NEO</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<button type="button" id = "XMR" class="btn btn-primary" onclick = "select_coin(event)">XMR</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
 		</div>
 	</nav>
 
