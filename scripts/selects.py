@@ -272,27 +272,54 @@ def find_orders(info):
     conn = psycopg2.connect(conn_string)
     cur = conn.cursor()
 
-    cur.execute(""" SELECT order_type, amount, price 
+    #Get open buy orders
+    cur.execute(""" SELECT amount, price 
                     FROM open_orders 
-                    WHERE coin_id = '""" + coin_type + """'
-                    ORDER BY ts DESC """)
+                    WHERE order_type = 'Buy' AND 
+                          coin_id = '""" + coin_type + """' 
+                    ORDER BY ts DESC""")
 
     select_result = cur.fetchall()
-    orders = []
+    buy_orders = []
 
     for order in select_result:
-        orders.append({
-            'order_type': order[0],
-            'order_amount': order[1],
-            'order_price': order[2]
+        buy_orders.append({
+            'order_amount': order[0],
+            'order_price': order[1]
         })
+
+
+
+    #Get open sell orders
+    cur.execute(""" SELECT amount, price 
+                    FROM open_orders 
+                    WHERE order_type = 'Sell' AND 
+                          coin_id = '""" + coin_type + """' 
+                    ORDER BY ts DESC""")
+
+    select_result = cur.fetchall()
+    sell_orders = []
+
+    for order in select_result:
+        sell_orders.append({
+            'order_amount': order[0],
+            'order_price': order[1]
+        })
+
+
+    #Combine results into a dictionary
+    open_orders = {
+        'buy_orders': buy_orders,
+        'sell_orders': sell_orders
+    }
+
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return orders
+    return open_orders
 
 
 def get_balances(user_name):

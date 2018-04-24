@@ -30,6 +30,9 @@ $(document).ready(function(){
 
 		console.log(response);
 
+		var buy_orders = response.buy_orders;
+		var sell_orders = response.sell_orders;
+
 
 		/***********************************************
 			Now that order data is correctly formatted:
@@ -38,9 +41,30 @@ $(document).ready(function(){
 		************************************************/
 		
 
-		var table_html = '';
+		var table_html = `	<thead>
+								<tr>
+									<th scope = "col">#</th>
+									<th scope = "col">` + current_coin + `</th>
+									<th scope = "col">` + current_coin + `/BTC</th>
+								</tr>
+							</thead>
+							<tbody>`
 
-		table_html += ` <thead>
+		for(let i = 0; i < buy_orders.length; i++){
+			table_html +=  `<tr>
+						   		<th scope = "row">` + (i + 1) + `</th>
+								<td>` + buy_orders[i].order_amount + `</td>
+								<td>` + buy_orders[i].order_price + `</td>
+							</tr>`;
+		}
+
+		table_html += "</tbody>";
+		document.getElementById("buy_order_table").innerHTML = table_html;
+
+
+
+
+		table_html = `	<thead>
 							<tr>
 								<th scope = "col">#</th>
 								<th scope = "col">` + current_coin + `</th>
@@ -49,23 +73,16 @@ $(document).ready(function(){
 						</thead>
 						<tbody>`
 
-		for(let i = 0; i < response.length; i++){
-
+		for(let i = 0; i < sell_orders.length; i++){
 			table_html +=  `<tr>
 						   		<th scope = "row">` + (i + 1) + `</th>
-								<td>` + response[i].order_amount + `</td>
-								<td>` + response[i].order_price + `</td>
+								<td>` + sell_orders[i].order_amount + `</td>
+								<td>` + sell_orders[i].order_price + `</td>
 							</tr>`;
-
 		}
 
-
-
 		table_html += "</tbody>";
-
-		//console.log(table_html);
-
-		document.getElementById("order_table").innerHTML = table_html;
+		document.getElementById("sell_order_table").innerHTML = table_html;
 	});
 
 
