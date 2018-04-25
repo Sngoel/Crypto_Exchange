@@ -114,7 +114,7 @@ var submit_order = function(){
 	var order_type = document.getElementById("order_type").value;
 
 	
-	else if(order_amount === "" || isNaN(order_amount) || parseInt(order_amount) <= 0){
+	if(order_amount === "" || isNaN(order_amount) || parseInt(order_amount) <= 0){
 		alert("Please enter a valid order amount");
 	}
 
