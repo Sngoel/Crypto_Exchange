@@ -6,11 +6,9 @@
 			background-image: url("http://www.access4.eu/_media/india_hg.jpg");
 			background-size: 100% 100%;
 		}
-		#order_book_container {
-			display: inline-block;
-			float: right;
-			margin-right: 5%;
-			width: 40%;
+		#order_panel {
+			width: 60%;
+			margin: 0% 20% 0% 20%;
 		}
 	</style>
 
@@ -79,54 +77,41 @@
 		</div>
 	</nav>
 
-
-
 	<br><br>
 
-	<div id = "order_panel" style = "width: 40%; margin: 0% 0% 0% 10%; border: 1px solid black;">
+	<div id = "order_panel" class = "well">
 
-		Order type: &nbsp;&nbsp;&nbsp;&nbsp;
-		<select id = "order_type">
-			<option value = "Buy">Buy</option>
-			<option value = "Sell">Sell</option>
-		</select><br><br>
-
-		Coin: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<select id = "coin_type">
-			<option value="Empty"></option>
-			<option value="ETH">ETH</option>
-			<option value="XRP">XRP</option>
-			<option value="BCH">BCH</option>
-			<option value="LTC">LTC</option>
-			<option value="EOS">EOS</option>
-			<option value="ADA">ADA</option>
-			<option value="XLM">XLM</option>
-			<option value="NEO">NEO</option>
-			<option value="XMR">XMR</option>
-		</select><br><br>
-
-		Amount: &nbsp;&nbsp;
-		<input type = "text" id = "order_amount"><br><br>
-			
-
-		Price: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<input type="text" id = 'order_price'><br><br>
-
-		<input type = "button" value = "Submit" onclick = "submit_order()">
+		<div class="form-group">
+			<label for = "order_type">Order Type:</label>
+			<select id = "order_type" class = "form-control">
+				<option value = "Buy">Buy</option>
+				<option value = "Sell">Sell</option>
+			</select>
+		</div>
+		<br>
+		<div class="form-group">
+			<label for = "order_amount">Amount:</label>
+			<input type = "text" id = "order_amount" class = "form-control">
+		</div>
+		<br>
+		<div class="form-group">
+			<label for = "order_price">Price:</label>
+			<input type = "text" id = "order_price" class = "form-control">
+		</div>
+		<br>
+		<button type="button" class="btn btn-default" onclick = "submit_order()">Submit</button>
 	</div>
 
 	<br><br><br>
 
 
-	<!-- Buy orders table -->
-	<div id = "order_book_container">
-		<table class = "table" id = "buy_order_table"></table>
-		<br><br><br>
-		<table class = "table" id = "sell_order_table"></table>
+	<div>
+		<table class = "table col-xs-4" id = "buy_order_table" style = "width: 40%; margin: 0% 10% 0% 5%;"></table>
+		<table class = "table col-xs-4" id = "sell_order_table" style = "width: 40%;"></table>
 	</div>
 
-	<!-- SAMPLE GRAPH -->
-	<div id = "graph" style="width: 500px; height: 400px; display: none; float: right;"></div>
+	<!-- SAMPLE GRAPH
+	<div id = "graph" style="width: 500px; height: 400px; display: none; float: right;"></div> -->
 
 </body>
 </html>

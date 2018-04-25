@@ -273,7 +273,7 @@ def find_orders(info):
     cur = conn.cursor()
 
     #Get open buy orders
-    cur.execute(""" SELECT amount, price 
+    cur.execute(""" SELECT amount, price, order_type 
                     FROM open_orders 
                     WHERE order_type = 'Buy' AND 
                           coin_id = '""" + coin_type + """' 
@@ -285,13 +285,14 @@ def find_orders(info):
     for order in select_result:
         buy_orders.append({
             'order_amount': order[0],
-            'order_price': order[1]
+            'order_price': order[1],
+            'order_type': order[2]
         })
 
 
 
     #Get open sell orders
-    cur.execute(""" SELECT amount, price 
+    cur.execute(""" SELECT amount, price, order_type 
                     FROM open_orders 
                     WHERE order_type = 'Sell' AND 
                           coin_id = '""" + coin_type + """' 
@@ -303,7 +304,8 @@ def find_orders(info):
     for order in select_result:
         sell_orders.append({
             'order_amount': order[0],
-            'order_price': order[1]
+            'order_price': order[1],
+            'order_type': order[2]
         })
 
 
@@ -337,19 +339,26 @@ def get_balances(user_name):
     user_id = cur.fetchall()[0][0]
 
 
-    sql = ("""SELECT coin_id, coin_balance
-            FROM balances as b
-            Where b.user_id = '"""+ str(user_id) + "'" )
+    cur.execute(""" SELECT coin_id, coin_balance
+               FROM balances 
+               WHERE user_id = '""" + str(user_id) + "'")
 
-    cur.execute(sql)
-    SELECT_result = cur.fetchall()
+
+    result_set = cur.fetchall()
+    balances = []
+
+    for balance in result_set:
+        balances.append({
+            'coin_id': balance[0],
+            'coin_balance': balance[1]
+        })
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return SELECT_result
+    return balances
 
 
 def get_history(user_name):
@@ -367,19 +376,29 @@ def get_history(user_name):
     user_id = cur.fetchall()[0][0]
 
 
-    sql = ("""SELECT *
-            FROM successful_orders as s
-            Where s.maker_user_id = '""" + str(user_id) + """' OR s.fulfiller_user_id = '""" + str(user_id) + "'" )
+    cur.execute(""" SELECT order_type, coin_id, amount, price, ts
+                    FROM successful_orders
+                    WHERE maker_user_id = '""" + str(user_id) + """' OR 
+                          fulfiller_user_id = '""" + str(user_id) + "'") 
 
-    cur.execute(sql)
-    SELECT_result = cur.fetchall()
+    select_result = cur.fetchall()
+    transactions = []
+
+    for transaction in select_result:
+        transactions.append({
+            'order_type': transaction[0],
+            'coin_id': transaction[1],
+            'amount': transaction[2],
+            'price': transaction[3],
+            'time': transaction[4]
+        })
 
     #Destroy connection
     cur.close()
     conn.commit()
     conn.close()
 
-    return SELECT_result
+    return transactions
 
 
 

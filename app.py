@@ -139,10 +139,7 @@ def get_balances():
 
 @app.route('/get_transaction_history', methods=['GET','POST'])
 def get_transaction_history():
-	history = selects.get_history(request.get_json())
-	for transaction in history:
-		print(transaction)
-	return jsonify(history)
+	return jsonify(selects.get_history(request.get_json()))
 
 
 

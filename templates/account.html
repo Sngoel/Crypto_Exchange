@@ -1,58 +1,64 @@
 <html>
 <head>
 	<title>0x431 Account</title>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	
+	<!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<!-- Our JS -->
 	<script src = "{{url_for('static', filename='helper_functions.js')}}"></script>
 	<script src = "{{url_for('static', filename='account.js')}}"></script>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style>
+		body {
+			background-image: url("http://notgoaway.com/wp-content/uploads/2017/07/Background-75.png");
+			background-size: 100% 100%;
+		}
+		#balance_table {
+			width: 35%;
+			display: inline-block;
+			margin: 0% 10% 0% 10%;
+		}
+		#transaction_table {
+			width: 35%;
+			display: inline-block;
+		}
+	</style>
 </head>
-<style>
-table, td {
-    border: 1px solid black;
-}
-</style>
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
 <body>
 
-		<nav class="navbar navbar-inverse">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<a class="navbar-brand" href="#"><strong>0x431 Cryptocurrency Exchange</strong></a>
-				</div>
-				<ul class="nav navbar-nav">
-					<li class="active"><a href="/dashboard">Dashboard</a></li>
-					<li><a href="/forum">Forum</a></li>
-				</ul>
-				<div class="form-group navbar-form navbar-left">
-					<input type="text" class="form-control " id = "search_bar" placeholder="Search">
-					<button type="button" class="btn btn-default" onclick = "search()">Submit</button>
-				</div>
-				<ul class="nav navbar-nav navbar-right">
-					<li><a href="/account"><span class="glyphicon glyphicon-user"></span> Account</a></li>
-					<li onclick = "log_out()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-				</ul>
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><strong>0x431 Cryptocurrency Exchange</strong></a>
 			</div>
-		</nav>
+			<ul class="nav navbar-nav">
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li><a href="/forum">Forum</a></li>
+			</ul>
+			<div class="form-group navbar-form navbar-left">
+				<input type="text" class="form-control " id = "search_bar" placeholder="Search">
+				<button type="button" class="btn btn-default" onclick = "search()">Submit</button>
+			</div>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="active"><a href="/account"><span class="glyphicon glyphicon-user"></span> Account</a></li>
+				<li onclick = "log_out()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+			</ul>
+		</div>
+	</nav>
 
-	<!-- Balance TABLE -->
-	<table id="transactionTable">
-		  <tr>
-		<td>Date</td>
-		<td>Order type</td>
-		<td>Coin ID</td>
-    <td>Amount</td>
-		<td>Price</td>
-  </tr>
-	</table>
 
-	<table id="myTable">
-		  <tr>
-    <td>Coin ID</td>
-    <td>Balance</td>
-  </tr>
-	</table>
+	<div>
+		<table class = "table col-xs-6" id = "balance_table"></table>
+		<table class = "table col-xs-6"" id = "transaction_table"></table>
+	</div>
 
 </body>
 </html>

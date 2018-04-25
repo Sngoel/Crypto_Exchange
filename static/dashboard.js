@@ -1,19 +1,7 @@
-//This file contains the JavaScript for dashboard.html
 
-
-//Globals and configuration variables
+//Globals
 var current_coin = "ETH";
 
-
-var tableTimer;
-var order_data = [];
-
-
-
-
-var currentIndex = 0;
-var shiftBy = 2;
-var secondsBetweenUpdates = 1;
 
 $(document).ready(function(){
 
@@ -23,8 +11,7 @@ $(document).ready(function(){
 	//Load data into tables
 	refresh_tables();
 
-
-	//Sample graph to build off of
+	/*//Sample graph to build off of
 	TESTER = document.getElementById('graph');
 	Plotly.plot(TESTER, [{
 		x: [1, 2, 3, 4, 5],
@@ -32,8 +19,8 @@ $(document).ready(function(){
 	}], {
 		margin: {
 		t: 0
-	}});
-}); 	//end of document.ready
+	}});*/
+});
 	
 
 var select_coin = function(event){
@@ -74,6 +61,7 @@ var refresh_tables = function(){
 									<th scope = "col">#</th>
 									<th scope = "col">` + current_coin + `</th>
 									<th scope = "col">` + current_coin + `/BTC</th>
+									<th scope = "col">Order Type</th>
 								</tr>
 							</thead>
 							<tbody>`
@@ -83,6 +71,7 @@ var refresh_tables = function(){
 						   		<th scope = "row">` + (i + 1) + `</th>
 								<td>` + buy_orders[i].order_amount + `</td>
 								<td>` + buy_orders[i].order_price + `</td>
+								<td>` + buy_orders[i].order_type + `</td>
 							</tr>`;
 		}
 
@@ -92,20 +81,22 @@ var refresh_tables = function(){
 
 
 
-		table_html = `	<thead>
-							<tr>
-								<th scope = "col">#</th>
-								<th scope = "col">` + current_coin + `</th>
-								<th scope = "col">` + current_coin + `/BTC</th>
-							</tr>
-						</thead>
-						<tbody>`
+		var table_html = `	<thead>
+								<tr>
+									<th scope = "col">#</th>
+									<th scope = "col">` + current_coin + `</th>
+									<th scope = "col">` + current_coin + `/BTC</th>
+									<th scope = "col">Order Type</th>
+								</tr>
+							</thead>
+							<tbody>`
 
 		for(let i = 0; i < sell_orders.length; i++){
 			table_html +=  `<tr>
 						   		<th scope = "row">` + (i + 1) + `</th>
 								<td>` + sell_orders[i].order_amount + `</td>
 								<td>` + sell_orders[i].order_price + `</td>
+								<td>` + sell_orders[i].order_type + `</td>
 							</tr>`;
 		}
 
@@ -117,14 +108,11 @@ var refresh_tables = function(){
 
 var submit_order = function(){
 
-	var coin_type = document.getElementById("coin_type").value;
+	var coin_type = current_coin;
 	var order_amount = document.getElementById("order_amount").value;
 	var order_price = document.getElementById("order_price").value;
 	var order_type = document.getElementById("order_type").value;
 
-	if(coin_type === "Empty"){
-		alert("Please select a coin type");
-	}
 	
 	else if(order_amount === "" || isNaN(order_amount) || parseInt(order_amount) <= 0){
 		alert("Please enter a valid order amount");
