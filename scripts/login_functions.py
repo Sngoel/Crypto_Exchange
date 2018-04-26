@@ -1,20 +1,28 @@
 import psycopg2
-from passlib.hash import sha256_crypt
+import hashlib
+import time
 
 
 def check_login(login_info):
 
     #Define connection parameters
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    
+
     #Connect to database
     conn = psycopg2.connect(conn_string)
 
     #Initialize cursor
     cur = conn.cursor()
+    password = login_info['password']
+    print(password)
+    passwordnew = hashlib.md5(password.encode())
+    print(passwordnew)
+    flowit = passwordnew.hexdigest()
+    print(flowit)
+
 
     sql = "SELECT * FROM users WHERE username = '" + login_info['username']
-    sql += "' AND password = '" + login_info['password'] + "'"
+    sql += "' AND password = '" + flowit + "'"
 
     cur.execute(sql)
     select_result = cur.fetchall()
@@ -28,7 +36,6 @@ def check_login(login_info):
 
     if len(select_result) == 0:
         return False
-    
+
     else:
         return True
-

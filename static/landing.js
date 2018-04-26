@@ -7,7 +7,7 @@ var login = function(){
 
 	//Hide register form
 	document.getElementById("register").style.display = "None";
-	
+
 	//Show login form
 	document.getElementById("login").style.display = "inline-block";
 };
@@ -19,7 +19,7 @@ var register = function(){
 
 	//Hide register form
 	document.getElementById("login").style.display = "None";
-	
+
 	//Show login form
 	document.getElementById("register").style.display = "inline-block";
 

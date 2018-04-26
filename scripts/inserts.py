@@ -1,5 +1,7 @@
 import psycopg2
 import sys
+import hashlib
+import time
 
 coins = ['BTC', 'ETH', 'XRP', 'BCH', 'LTC', 'EOS', 'ADA', 'XLM', 'NEO', 'XMR']
 
@@ -27,15 +29,15 @@ def submit_question(question_info):
     user_id = cur.fetchall()[0][0]
 
 
-    insert = """ INSERT INTO questions (user_id, question_summary, question_desc, category) 
+    insert = """ INSERT INTO questions (user_id, question_summary, question_desc, category)
                  VALUES ('""" + str(user_id) + "', '" + question_summary + "', '" + question_description+ "', '" + str(category) + "')"
 
     cur.execute(insert)
 
     #Get question_id to return to client
-    get_question_id = """ SELECT question_id 
+    get_question_id = """ SELECT question_id
                          FROM questions
-                         WHERE user_id = '""" + str(user_id) + """' AND 
+                         WHERE user_id = '""" + str(user_id) + """' AND
                                question_summary = '""" + question_summary + """' AND
                                question_desc = '""" + question_description + "'"
 
@@ -72,15 +74,15 @@ def submit_comment(comment_info):
     user_id = cur.fetchall()[0][0]
 
 
-    insert = """ INSERT INTO comments (user_id, question_id, comment_text) 
+    insert = """ INSERT INTO comments (user_id, question_id, comment_text)
                  VALUES ('""" + str(user_id) + "', '" + str(question_id) + "', '" + comment_text+ "')"
 
     cur.execute(insert)
 
     #Get comment_id to return to client
-    get_comment_id = """ SELECT comment_id 
+    get_comment_id = """ SELECT comment_id
                          FROM comments
-                         WHERE user_id = '""" + str(user_id) + """' AND 
+                         WHERE user_id = '""" + str(user_id) + """' AND
                                comment_text = '""" + comment_text + "'"
 
     cur.execute(get_comment_id)
@@ -98,7 +100,7 @@ def insert_into_users(forms):
 
     #Define our connection parameters
     conn_string = "host='localhost' dbname='postgres' user='postgres' password='password'"
-    
+
     #Connect to database
     conn = psycopg2.connect(conn_string)
 
@@ -109,11 +111,14 @@ def insert_into_users(forms):
     username = forms['username']
     password = forms['password']
     email = forms['email']
+    passwordnew = hashlib.md5(password.encode())
+    print(passwordnew)
 
 
-    cur.execute(""" SELECT username, email 
-                    FROM users 
-                    WHERE username = '""" + username + """' OR 
+
+    cur.execute(""" SELECT username, email
+                    FROM users
+                    WHERE username = '""" + username + """' OR
                           email = '""" + email + "'")
 
 
@@ -125,7 +130,7 @@ def insert_into_users(forms):
         return False
 
 
-    cur.execute("INSERT INTO users (username, password, email) VALUES(%s, %s, %s);", (username, password, email))
+    cur.execute("INSERT INTO users (username, password, email) VALUES(%s, %s, %s);", (username, passwordnew.hexdigest(), email))
     cur.execute("SELECT user_id FROM users WHERE username = '" + username + "'")
     user_id = cur.fetchall()[0][0]
 
@@ -414,7 +419,7 @@ def submit_order(order_info):
 
     cur.execute(get_user_balance)
     balance = cur.fetchall()[0][0]
-  
+
 
     ################################
     #The user has insufficient funds
@@ -444,15 +449,15 @@ def submit_order(order_info):
 
 
         #########################################################
-        #Find all orders in open_orders matching the user's order 
+        #Find all orders in open_orders matching the user's order
         #########################################################
         opposite_order_type = "Sell" if order_type == "Buy" else "Buy"
 
-        cur.execute(""" SELECT order_id, user_id, amount 
-                        FROM open_orders 
+        cur.execute(""" SELECT order_id, user_id, amount
+                        FROM open_orders
                         WHERE coin_id = '""" + coin_type + """' AND
                               price = '""" + str(order_price) + """' AND
-                              order_type  = '""" + opposite_order_type + """' 
+                              order_type  = '""" + opposite_order_type + """'
                         ORDER BY ts ASC """)
 
         result_set = cur.fetchall()
@@ -475,7 +480,7 @@ def submit_order(order_info):
             ########################################################################
             #There are no matching orders; insert into entire order into open_orders
             ########################################################################
-            cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts) 
+            cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts)
                             VALUES ('""" + str(user_id) + "', '" + order_type + "', '" + coin_type + "', " + str(order_amount) + ", " + str(order_price) + ", NOW())")
             cur.close()
             conn.commit()
@@ -493,7 +498,7 @@ def submit_order(order_info):
             for matching_order in matching_orders:
 
                 if amount_remaining > matching_order['amount']:
-                    
+
                     #Remove the matching order from open_orders
                     delete_open_order(cur, matching_order['order_id'])
 
@@ -516,7 +521,7 @@ def submit_order(order_info):
 
                         #Update maker's balance
                         update_balance(cur, matching_order['user_id'], coin_type, matching_order['amount'])
-                    
+
                     #Update amount_remaining
                     amount_remaining -= matching_order['amount']
 
@@ -529,7 +534,7 @@ def submit_order(order_info):
 
                     #Create a successful order for the transaction
                     create_successful_order(cur, matching_order['user_id'], user_id, opposite_order_type, coin_type, amount_remaining, order_price)
-         
+
                     #Update both users' balances
                     if order_type == "Buy":
 
@@ -590,10 +595,10 @@ def submit_order(order_info):
 
             ####################################################################################
             #If there's still something left in amount_remaining, create a new row in open_order
-            #################################################################################### 
+            ####################################################################################
             if amount_remaining != 0:
 
-                cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts) 
+                cur.execute(""" INSERT INTO open_orders (user_id, order_type, coin_id, amount, price, ts)
                                 VALUES ('""" + str(user_id) + "', '" + order_type + "', '" + coin_type + "', " + str(amount_remaining) + ", " + str(order_price) + ", NOW())")
 
                 cur.close()
@@ -623,9 +628,9 @@ def submit_order(order_info):
 
 def update_balance(cur, user_id, coin_id, balance_increment):
 
-    cur.execute(""" UPDATE balances 
-                    SET coin_balance = coin_balance + """ + str(balance_increment) + """ 
-                    WHERE user_id = '""" + str(user_id) + """' AND 
+    cur.execute(""" UPDATE balances
+                    SET coin_balance = coin_balance + """ + str(balance_increment) + """
+                    WHERE user_id = '""" + str(user_id) + """' AND
                           coin_id = '""" + coin_id + "'")
 
 
@@ -640,14 +645,14 @@ def delete_open_order(cur, order_id):
 #Add a row to the successful_orders table
 def create_successful_order(cur, maker_id, fulfiller_id, order_type, coin_id, amount, price):
 
-    cur.execute(""" INSERT INTO successful_orders (maker_user_id, fulfiller_user_id, order_type , coin_id, amount, price, ts) 
-        VALUES ('""" + str(maker_id) + "', '" + str(fulfiller_id) + "','" + order_type + "','""" 
+    cur.execute(""" INSERT INTO successful_orders (maker_user_id, fulfiller_user_id, order_type , coin_id, amount, price, ts)
+        VALUES ('""" + str(maker_id) + "', '" + str(fulfiller_id) + "','" + order_type + "','"""
                      + coin_id + "','" + str(amount) + "','" + str(price) + "', NOW())")
 
 
 
 def update_open_order(cur, order_id, new_amount):
 
-    cur.execute(""" UPDATE open_orders 
+    cur.execute(""" UPDATE open_orders
                     SET amount = """ + str(new_amount) + """
                     WHERE order_id = """ + str(order_id))

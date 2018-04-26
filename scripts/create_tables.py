@@ -21,7 +21,7 @@ def create_and_populate_tables():
         """CREATE TABLE users (
             user_id SERIAL PRIMARY KEY,
             username VARCHAR(20) UNIQUE,
-            password VARCHAR(30),
+            password VARCHAR(100),
             email VARCHAR(50) UNIQUE)""",
 
         """INSERT INTO users (username, password, email) VALUES
@@ -102,7 +102,7 @@ def create_and_populate_tables():
         ###################################################
         ###   ALL COMMENT-RELATED TABLES AND INSERTS   ###
         ###################################################
-         
+
         """CREATE TABLE comments (
                 comment_id SERIAL PRIMARY KEY,
                 user_id INT REFERENCES users(user_id),
@@ -145,7 +145,7 @@ def array_to_sql_string(array):
 
     sql_string = ""
     for i in range(len(array)):
-        
+
         if i == 0:
             sql_string += "('" + array[i] + "')"
 
@@ -181,12 +181,12 @@ def generate_orders(number_of_entries, number_of_users, coins):
 
         else:
             order_strings += ",\n(" + str(user_id) + ", '" + order_type + "', '" + coin1 + "', '" + str(amount1) + "', '" + str(amount2) +  "', NOW()" ")"
-    
+
     return order_strings
 
 
 
-#Since the combination of user and question_id needs to be unique, 
+#Since the combination of user and question_id needs to be unique,
 # we can't just randomly generate votes using a random user_id and a random
 # question_id. Since each user can only vote on each question once, we'll just use
 # a nested for loop to get each user to vote randomly on each question.
